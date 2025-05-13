@@ -1,0 +1,43 @@
+﻿using System.Windows.Input;
+
+namespace FocusCycle.Infrasctructure.Commands.Base
+{
+    internal abstract class Command : ICommand
+    {
+        public event EventHandler? CanExecuteChanged
+        {
+            add => CommandManager.RequerySuggested += value;
+            remove => CommandManager.RequerySuggested -= value;
+        }
+
+        private bool _executable;
+
+        public bool Executable
+        {
+            get => _executable;
+            set
+            {
+                if(Equals(value, _executable)) return;
+                _executable = value;
+                CommandManager.InvalidateRequerySuggested();
+            }
+        }
+
+        bool ICommand.CanExecute(object? parameter) => _executable && CanExecute(parameter);
+
+        void ICommand.Execute(object? parameter)
+        {
+            if(CanExecute(parameter))
+                Execute(parameter);
+        }
+
+        private event EventHandler? CanExecuteChangedHandlers;
+
+        protected virtual void OnCanExecuteChanged(EventArgs? e = null) => 
+            CanExecuteChangedHandlers?.Invoke(this, e ?? EventArgs.Empty);
+
+        protected virtual bool CanExecute(object? parameter) => true;
+
+        protected abstract void Execute(object? parameter);
+    }
+}
