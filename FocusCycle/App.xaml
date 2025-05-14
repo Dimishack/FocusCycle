@@ -2,8 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FocusCycle"
+             xmlns:vml="clr-namespace:FocusCycle.ViewModels.RLViewModels"
              StartupUri="Views/Windows/StartWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <vml:ViewModelsLocator x:Key="VMLocator"/>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -7,7 +7,11 @@
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
-        Title="MainWindow" Height="200" Width="500">
+        DataContext="{Binding Source={StaticResource VMLocator}, Path=StartWViewModel}"
+        
+        xmlns:vm="clr-namespace:FocusCycle.ViewModels"
+        d:DataContext="{d:DesignInstance {x:Type vm:StartWViewModel}, IsDesignTimeCreatable=True}"
+        Title="StartWindow" Height="200" Width="500">
     <Window.Style>
         <Style TargetType="Window">
             <Setter Property="WindowChrome.WindowChrome">
@@ -45,10 +49,14 @@
                            FontWeight="Bold"/>
             </Border>
             <UniformGrid Rows="1">
-                <Button Margin="3" Content="Старт"/>
-                <Button Margin="3" Content="Перерыв"/>
-                <Button Margin="3" Content="Настройки"/>
-                <Button Margin="3" Content="Закрыть"/>
+                <Button Margin="3" Content="Старт"
+                        Command="{Binding OpenTimerWindowCommand}"/>
+                <Button Margin="3" Content="Перерыв"
+                        Command="{Binding OpenTimerWindowCommand}"/>
+                <Button Margin="3" Content="Настройки"
+                        Command="{Binding OpenSettingsWindowCommand}"/>
+                <Button Margin="3" Content="Закрыть"
+                        Command="{Binding CloseWindowCommand}"/>
             </UniformGrid>
         </DockPanel>
     </Border>
