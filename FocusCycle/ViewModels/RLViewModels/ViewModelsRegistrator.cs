@@ -7,16 +7,6 @@ namespace FocusCycle.ViewModels.RLViewModels
     {
         public static IServiceCollection AddViewModels(this IServiceCollection services) => services
             .AddTransient<StartWViewModel>()
-            .AddTransient(services =>
-            {
-                var window = new SettingsWindow();
-                return window;
-            })
-            .AddTransient(services =>
-            {
-                var window = new TimerWindow();
-                return window;
-            })
             ;
     }
 }

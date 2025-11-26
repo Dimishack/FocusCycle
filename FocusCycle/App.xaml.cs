@@ -1,5 +1,6 @@
 ﻿using FocusCycle.Services.RLServices;
 using FocusCycle.ViewModels.RLViewModels;
+using FocusCycle.Views.Windows;
 using Microsoft.Extensions.Hosting;
 using System.Windows;
 
@@ -13,6 +14,7 @@ namespace FocusCycle
             .CreateDefaultBuilder(Environment.GetCommandLineArgs())
             .ConfigureServices((host, services) => services
             .AddViewModels()
+            .AddWindows()
             .AddServices())
             .Build();
 

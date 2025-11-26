@@ -15,15 +15,15 @@
             Task task = _executeAsync(parameter);
             _ = Interlocked.Exchange(ref _executingAction, task);
             _executingAction = task;
-            OnCanExecuteChanged();
+            OnRaiseCanExecuteChanged();
             try
             {
-                await task.ConfigureAwait(false);
+                await task.ConfigureAwait(true);
             }
             catch (OperationCanceledException)
             {
             }
-            OnCanExecuteChanged();
+            OnRaiseCanExecuteChanged();
         }
     }
 
@@ -43,15 +43,15 @@
             Task task = _executeAsync(val);
             _ = Interlocked.Exchange(ref _executingAction, task);
             _executingAction = task;
-            OnCanExecuteChanged();
+            OnRaiseCanExecuteChanged();
             try
             {
-                await task.ConfigureAwait(false);
+                await task.ConfigureAwait(true);
             }
             catch (OperationCanceledException)
             {
             }
-            OnCanExecuteChanged();
+            OnRaiseCanExecuteChanged();
         }
     }
 }

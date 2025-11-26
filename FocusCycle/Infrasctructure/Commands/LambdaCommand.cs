@@ -7,7 +7,12 @@
 
         protected override bool CanExecute(object? parameter) => _canExecute?.Invoke(parameter) ?? true;
 
-        protected override void Execute(object? parameter) => _execute(parameter);
+        protected override void Execute(object? parameter)
+        {
+            if (CanExecute(parameter))
+                _execute(parameter);
+            OnRaiseCanExecuteChanged();
+        }
     }
 
     internal class LambdaCommand<T>(Action<T> execute, Func<T, bool>? canExecute = null) : Base.Command
@@ -22,6 +27,7 @@
         {
             if (CanExecute(parameter) && parameter is T val)
                 _execute(val);
+            OnRaiseCanExecuteChanged();
         }
     }
 }

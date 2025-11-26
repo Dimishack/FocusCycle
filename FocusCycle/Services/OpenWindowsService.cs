@@ -9,7 +9,9 @@ namespace FocusCycle.Services
     {
         private Window? _settingsWindow;
         private Window? _timerWindow;
-        
+
+        public bool IsOpenSettingWindow => _settingsWindow is not null;
+
         public void OpenSettingsWindow()
         {
             if(_settingsWindow is { } window)

@@ -4,11 +4,9 @@ namespace FocusCycle.Infrasctructure.Commands.Base
 {
     internal abstract class Command : ICommand
     {
-        public event EventHandler? CanExecuteChanged
-        {
-            add => CommandManager.RequerySuggested += value;
-            remove => CommandManager.RequerySuggested -= value;
-        }
+        public event EventHandler? CanExecuteChanged;
+        public void OnRaiseCanExecuteChanged()
+            => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
         private bool _executable = true;
 
@@ -19,7 +17,6 @@ namespace FocusCycle.Infrasctructure.Commands.Base
             {
                 if(Equals(value, _executable)) return;
                 _executable = value;
-                CommandManager.InvalidateRequerySuggested();
             }
         }
 
@@ -30,11 +27,6 @@ namespace FocusCycle.Infrasctructure.Commands.Base
             if(CanExecute(parameter))
                 Execute(parameter);
         }
-
-        private event EventHandler? CanExecuteChangedHandlers;
-
-        protected virtual void OnCanExecuteChanged(EventArgs? e = null) => 
-            CanExecuteChangedHandlers?.Invoke(this, e ?? EventArgs.Empty);
 
         protected virtual bool CanExecute(object? parameter) => true;
 

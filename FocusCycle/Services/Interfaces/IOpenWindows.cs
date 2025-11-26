@@ -2,6 +2,7 @@
 {
     interface IOpenWindows
     {
+        bool IsOpenSettingWindow { get; }
         void OpenSettingsWindow();
 
         void OpenTimerWindow();

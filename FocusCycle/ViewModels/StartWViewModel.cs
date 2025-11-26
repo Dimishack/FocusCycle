@@ -3,77 +3,49 @@ using FocusCycle.Services.Interfaces;
 using FocusCycle.ViewModels.Base;
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace FocusCycle.ViewModels
 {
-    class StartWViewModel(IOpenWindows openWindows) : ViewModel
+    internal sealed class StartWViewModel(IOpenWindows openWindows) : ViewModel
     {
-		private IOpenWindows _openWindows = openWindows;
+		private readonly IOpenWindows _openWindows = openWindows;
+        private readonly DispatcherTimer _timer = new()
+        {
+            Interval = TimeSpan.FromSeconds(6)
+        };
 
-		#region Properties...
+        #region Properties...
 
-		#endregion
+        #endregion
 
-		#region Commands...
+        #region Commands...
 
-		#region OpenTimerWindowCommand - Команда - открыть окно с таймером
+        #region LoadedCommand - Команда - загрузка
 
-		///<summary>Команда - открыть окно с таймером</summary>
-		private ICommand? _openTimerWindowCommand;
+        ///<summary>Команда - загрузка</summary>
+        private ICommand? _loadedCommand;
 
-		///<summary>Команда - открыть окно с таймером</summary>
-		public ICommand OpenTimerWindowCommand => _openTimerWindowCommand
-			??= new LambdaCommand(OnOpenTimerWindowCommandExecuted);
+		///<summary>Команда - загрузка</summary>
+		public ICommand LoadedCommand => _loadedCommand
+			??= new LambdaCommand(OnLoadedCommandExecuted);
 
-		///<summary>Логика выполнения - открыть окно с таймером</summary>
-		private void OnOpenTimerWindowCommandExecuted(object? p)
+		///<summary>Логика выполнения - загрузка</summary>
+		private void OnLoadedCommandExecuted(object? p)
 		{
-			_openWindows.OpenTimerWindow();
-			CloseWindow();
+            _timer.Tick += Timer_Tick;
+			_timer.Start();
 		}
 
-		#endregion
+        private void Timer_Tick(object? sender, EventArgs e)
+        {
+			_timer.Stop();
+			_timer.Tick -= Timer_Tick;
+			_openWindows.OpenTimerWindow(); 
+			Application.Current.MainWindow.Close();
+        }
 
-		#region OpenSettingsWindowCommand - Команда - открыть окно с настройками
-
-		///<summary>Команда - открыть окно с настройками</summary>
-		private ICommand? _openSettingsWindowCommand;
-
-		///<summary>Команда - открыть окно с настройками</summary>
-		public ICommand OpenSettingsWindowCommand => _openSettingsWindowCommand
-			??= new LambdaCommand(OnOpenSettingsWindowCommandExecuted, CanOpenSettingsWindowCommandExecute);
-
-		///<summary>Проверка возможности выполнения - открыть окно с настройками</summary>
-		private bool CanOpenSettingsWindowCommandExecute(object? p) => true;
-
-		///<summary>Логика выполнения - открыть окно с настройками</summary>
-		private void OnOpenSettingsWindowCommandExecuted(object? p)
-		{
-			_openWindows.OpenSettingsWindow();
-			CloseWindow();
-		}
-
-		#endregion
-
-		#region CloseWindowCommand - Команда - закрыть окно
-
-		///<summary>Команда - закрыть окно</summary>
-		private ICommand? _closeWindowCommand;
-
-		///<summary>Команда - закрыть окно</summary>
-		public ICommand CloseWindowCommand => _closeWindowCommand
-			??= new LambdaCommand(OnCloseWindowCommandExecuted);
-
-        ///<summary>Логика выполнения - закрыть окно</summary>
-        private void OnCloseWindowCommandExecuted(object? p) => CloseWindow();
-
-		#endregion
-
-		#endregion
-
-		#region Methods...
-
-		private void CloseWindow() => Application.Current.MainWindow.Close();
+        #endregion
 
 		#endregion
 	}
