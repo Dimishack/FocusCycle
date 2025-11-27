@@ -1,7 +1,6 @@
 ﻿using FocusCycle.Infrasctructure.Commands;
 using FocusCycle.Services.Interfaces;
 using FocusCycle.ViewModels.Base;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 
@@ -41,8 +40,8 @@ namespace FocusCycle.ViewModels
         {
 			_timer.Stop();
 			_timer.Tick -= Timer_Tick;
-			_openWindows.OpenTimerWindow(); 
-			Application.Current.MainWindow.Close();
+			_openWindows.OpenTimerWindow();
+            App.CloseConnectedWindow(this);
         }
 
         #endregion

@@ -5,9 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
         mc:Ignorable="d"
-        Title="TimerWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock Text="Timer" HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-    </Grid>
+        Style="{StaticResource WindowMainStyle}"
+        Title="TimerWindow" Height="600" Width="400">
+    <DockPanel>
+    </DockPanel>
 </Window>

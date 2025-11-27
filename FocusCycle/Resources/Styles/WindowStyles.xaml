@@ -1,0 +1,50 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="clr-namespace:FocusCycle.Infrasctructure.Commands">
+    <Style TargetType="Window"
+           x:Key="WindowMainStyle">
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome CaptionHeight="20"
+                              CornerRadius="15"
+                              UseAeroCaptionButtons="False"
+                              ResizeBorderThickness="5"
+                              GlassFrameThickness="0"
+                              NonClientFrameEdges="None"/>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Window">
+                    <Border x:Name="PART_Border" Background="Brown" Padding="1.5,5,5,5">
+                        <Grid x:Name="PART_MainGrid">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <UniformGrid Rows="1" Grid.Row="0" HorizontalAlignment="Right">
+                                <Button VerticalContentAlignment="Bottom">
+                                    <!--<Button.Command>
+                                        <c:MinimizeWindowCommand/>
+                                    </Button.Command>-->
+                                </Button>
+                                <Button Content="Close"
+                                        CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                        WindowChrome.IsHitTestVisibleInChrome="True">
+                                    <Button.Command>
+                                        <c:CloseWindowCommand/>
+                                    </Button.Command>
+                                </Button>
+                            </UniformGrid>
+                            <AdornerDecorator Grid.Row="1"
+                                              KeyboardNavigation.IsTabStop="False">
+                                <ContentPresenter KeyboardNavigation.TabNavigation="Cycle"
+                                                  x:Name="MainContentPresenter"/>
+                            </AdornerDecorator>
+                        </Grid>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>
