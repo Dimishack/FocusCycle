@@ -37,7 +37,7 @@ namespace FocusCycle
             var host = Host;
             base.OnStartup(e);
             await host.StartAsync();
-            Services.GetRequiredService<StartWindow>().Show();
+            Services.GetRequiredService<TimerWindow>().Show();
         }
 
         protected override async void OnExit(ExitEventArgs e)

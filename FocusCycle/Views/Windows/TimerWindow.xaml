@@ -4,9 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
+        
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:vm="clr-namespace:FocusCycle.ViewModels"
+        xmlns:ap="clr-namespace:FocusCycle.Infrasctructure.AttachedProperties"
+        
+        d:DataContext="{d:DesignInstance {x:Type vm:TimerViewModel}}"
+        ap:WindowProperties.ShowSettings="True"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
-        Title="TimerWindow" Height="600" Width="400">
+        Title="TimerWindow" Height="300" Width="400">
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Closed">
+            <i:InvokeCommandAction Command="{Binding ClosedCommand}"/>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
     <DockPanel>
+        
     </DockPanel>
 </Window>

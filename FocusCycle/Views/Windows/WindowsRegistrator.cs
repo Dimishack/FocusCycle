@@ -17,7 +17,11 @@ namespace FocusCycle.Views.Windows
             })
             .AddTransient(services =>
             {
-                var window = new SettingsWindow();
+                var window = new SettingsWindow()
+                {
+                    Owner = App.AcivedWindow,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner
+                };
                 return window;
             })
             .AddTransient(services =>
