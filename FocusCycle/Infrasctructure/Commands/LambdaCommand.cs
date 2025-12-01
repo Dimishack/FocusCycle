@@ -11,7 +11,7 @@
         {
             if (CanExecute(parameter))
                 _execute(parameter);
-            OnRaiseCanExecuteChanged();
+            OnRaiseCanExecuted();
         }
     }
 
@@ -27,7 +27,7 @@
         {
             if (CanExecute(parameter) && parameter is T val)
                 _execute(val);
-            OnRaiseCanExecuteChanged();
+            OnRaiseCanExecuted();
         }
     }
 }

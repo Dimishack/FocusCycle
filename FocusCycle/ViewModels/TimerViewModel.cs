@@ -1,16 +1,11 @@
 ﻿using FocusCycle.Infrasctructure.Commands;
+using FocusCycle.Infrasctructure.Commands.Base;
 using FocusCycle.Models;
 using FocusCycle.Services.Interfaces;
 using FocusCycle.ViewModels.Base;
 using MessagePack;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Input;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FocusCycle.ViewModels
 {
@@ -18,9 +13,33 @@ namespace FocusCycle.ViewModels
     {
         private const string SETTINGS_FILENAME = "Settings.bin";
         private TimerSettings? _settings;
+        private bool _isCurrentWorkTimer;
         private readonly IOpenWindows _openWindows;
 
         #region Properties...
+
+        #region Header : string - Заголовок
+
+        ///<summary>Заголовок</summary>
+        public string Header => _isCurrentWorkTimer
+            ? "Р а б о т а"
+            : "П е р е р ы в";
+
+        #endregion
+
+        #region IsTimerPause : bool - Таймер на паузе
+
+        ///<summary>Таймер на паузе</summary>
+        private bool _isTimerPause;
+
+        ///<summary>Таймер на паузе</summary>
+        public bool IsTimerPause
+        {
+            get => _isTimerPause;
+            set => Set(ref _isTimerPause, value);
+        }
+
+        #endregion
 
         #region TimerModel : TimerModel - Таймер
 
@@ -53,6 +72,9 @@ namespace FocusCycle.ViewModels
         private async Task OnLoadedCommandExecuted(object? p)
         {
             _settings = await ReadSettingsAsync();
+            ((Command)PlayNextCycleCommand).OnRaiseCanExecuted();
+            _isCurrentWorkTimer = true;
+            OnPropertyChanged(nameof(Header));
             _timerModel.NextTimer(_settings.WorkTimer);
         }
 
@@ -65,26 +87,42 @@ namespace FocusCycle.ViewModels
 
         ///<summary>Команда - закрытие</summary>
         public ICommand ClosedCommand => _closedCommand
-            ??= new LambdaCommand(OnClosedCommandExecuted);
+            ??= new LambdaCommandAsync(OnClosedCommandExecuted);
 
         ///<summary>Логика выполнения - закрытие</summary>
-        private void OnClosedCommandExecuted(object? p) => App.Current.Shutdown();
+        private async Task OnClosedCommandExecuted(object? p)
+        {
+            if (_settings is not null)
+                await WriteSettingsAsync(_settings);
+            App.Current.Shutdown();
+        }
 
         #endregion
 
-        #region PlayNextTimerCommand - Команда - запустить следующий таймер
+        #region PlayNextCycleCommand - Команда - запустить следующий цикл
 
-        ///<summary>Команда - запустить следующий таймер</summary>
-        private ICommand? _playNextTimerCommand;
+        ///<summary>Команда - запустить следующий цикл</summary>
+        private ICommand? _playNextCycleCommand;
 
-        ///<summary>Команда - запустить следующий таймер</summary>
-        public ICommand PlayNextTimerCommand => _playNextTimerCommand
-            ??= new LambdaCommand(OnPlayNextTimerCommandExecuted);
+        ///<summary>Команда - запустить следующий цикл</summary>
+        public ICommand PlayNextCycleCommand => _playNextCycleCommand
+            ??= new LambdaCommand(OnPlayNextCycleCommandExecuted, CanPlayNextCycleCommandExecute);
 
-        ///<summary>Логика выполнения - запустить следующий таймер</summary>
-        private void OnPlayNextTimerCommandExecuted(object? p)
+        ///<summary>Проверка возможности выполнения - запустить следующий цикл</summary>
+        private bool CanPlayNextCycleCommandExecute(object? p) => _settings is not null;
+
+        ///<summary>Логика выполнения - запустить следующий цикл</summary>
+        private void OnPlayNextCycleCommandExecuted(object? p)
         {
+            if (_settings is null) return;
+            TimeSpan nextTimer = _settings.WorkTimer;
+            if(_isCurrentWorkTimer)
+                nextTimer = _settings.BreakTimer;
 
+            _isCurrentWorkTimer = !_isCurrentWorkTimer;
+            OnPropertyChanged(nameof(Header));
+            _timerModel.NextTimer(nextTimer);
+            IsTimerPause = false;
         }
 
         #endregion
@@ -147,6 +185,17 @@ namespace FocusCycle.ViewModels
             {
             }
             return settings;
+        }
+
+        #endregion
+
+        #region WriteSettingsAsync : async Task - Запись файла с настройками
+
+        ///<summary>Запись файла с настройками</summary>
+        private async Task WriteSettingsAsync(TimerSettings settings)
+        {
+            using (var fs = new FileStream(SETTINGS_FILENAME, FileMode.Create))
+                await MessagePackSerializer.SerializeAsync(fs, settings);
         }
 
         #endregion

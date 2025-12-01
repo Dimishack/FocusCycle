@@ -5,7 +5,7 @@ namespace FocusCycle.Infrasctructure.Commands.Base
     internal abstract class Command : ICommand
     {
         public event EventHandler? CanExecuteChanged;
-        public void OnRaiseCanExecuteChanged()
+        public void OnRaiseCanExecuted()
             => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
         private bool _executable = true;

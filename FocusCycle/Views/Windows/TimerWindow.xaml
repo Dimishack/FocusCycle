@@ -27,10 +27,11 @@
     </Window.Resources>
     <DockPanel>
         <TextBlock DockPanel.Dock="Top"
-                   Text="Работа/Перерыв"
+                   Text="{Binding Header}"
                    FontSize="32"
                    HorizontalAlignment="Center"
                    VerticalAlignment="Top"
+                   FontWeight="Bold"
                    Margin="0,0,0,5"/>
         <Button DockPanel.Dock="Bottom"
                 HorizontalAlignment="Right"
@@ -41,13 +42,14 @@
         <ToggleButton DockPanel.Dock="Left"
                       Style="{StaticResource PlayPauseToggleButtonStyle}"
                       VerticalAlignment="Top"
+                      IsChecked="{Binding IsTimerPause}"
                       Command="{Binding PlayPauseTimerCommand}"/>
         <Button DockPanel.Dock="Right"
-                      Style="{StaticResource NextCycleButtonStyle}"
-                      VerticalAlignment="Top"/>
+                Style="{StaticResource NextCycleButtonStyle}"
+                VerticalAlignment="Top"
+                Command="{Binding PlayNextCycleCommand}"/>
         <TextBlock Text="{Binding TimerModel.TimeString}"
                    FontWeight="Bold"
-                   FontFamily="Times New Roman"
                    FontSize="40"
                    HorizontalAlignment="Stretch"
                    TextAlignment="Center"

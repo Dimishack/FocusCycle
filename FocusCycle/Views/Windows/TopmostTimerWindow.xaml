@@ -23,7 +23,6 @@
         <cusB:MoveWindowBehavior/>
     </i:Interaction.Behaviors>
     <TextBlock Text="22:22:22"
-               FontFamily="Times New Roman"
                FontWeight="Bold"
                FontSize="96"
                Opacity="1"
