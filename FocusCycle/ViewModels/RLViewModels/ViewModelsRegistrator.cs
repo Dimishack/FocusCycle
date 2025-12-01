@@ -1,5 +1,4 @@
-﻿using FocusCycle.Views.Windows;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace FocusCycle.ViewModels.RLViewModels
 {
@@ -8,6 +7,7 @@ namespace FocusCycle.ViewModels.RLViewModels
         public static IServiceCollection AddViewModels(this IServiceCollection services) => services
             .AddTransient<StartWViewModel>()
             .AddTransient<TimerViewModel>()
+            .AddTransient<TopmostTimerViewModel>()
             ;
     }
 }

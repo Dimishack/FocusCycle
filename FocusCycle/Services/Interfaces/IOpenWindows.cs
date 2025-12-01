@@ -3,8 +3,10 @@
     interface IOpenWindows
     {
         bool IsOpenSettingWindow { get; }
-        void OpenSettingsWindow();
+        bool IsOpenTopmostTimerWindow { get; }
 
+        void OpenSettingsWindow();
         void OpenTimerWindow();
+        void OpenTopmostTimerWindow();
     }
 }

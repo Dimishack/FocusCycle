@@ -1,0 +1,32 @@
+﻿<Window x:Class="FocusCycle.Views.Windows.TopmostTimerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FocusCycle.Views.Windows"
+        mc:Ignorable="d"
+        Topmost="True"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        ShowInTaskbar="False"
+        Background="{StaticResource SolidColorBrush_Transparent}"
+        
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
+        
+        Title="TopmostTimerWindow" Height="110" Width="360">
+    <Window.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
+    </Window.Resources>
+    <i:Interaction.Behaviors>
+        <cusB:MoveWindowBehavior/>
+    </i:Interaction.Behaviors>
+    <TextBlock Text="22:22:22"
+               FontFamily="Times New Roman"
+               FontWeight="Bold"
+               FontSize="96"
+               Opacity="1"
+               VerticalAlignment="Top"
+               HorizontalAlignment="Center"/>
+</Window>

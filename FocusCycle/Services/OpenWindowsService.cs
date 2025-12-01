@@ -9,8 +9,10 @@ namespace FocusCycle.Services
     {
         private Window? _settingsWindow;
         private Window? _timerWindow;
+        private Window? _topmostTimerWindow;
 
         public bool IsOpenSettingWindow => _settingsWindow is not null;
+        public bool IsOpenTopmostTimerWindow => _topmostTimerWindow is not null;
 
         public void OpenSettingsWindow()
         {
@@ -36,6 +38,19 @@ namespace FocusCycle.Services
             window.Closed += (_, _) => _timerWindow = null;
             _timerWindow = window;
             _timerWindow.Show();
+        }
+
+        public void OpenTopmostTimerWindow()
+        {
+            if (_topmostTimerWindow is { } window)
+            {
+                window.Show();
+                return;
+            }
+            window = App.Services.GetRequiredService<TopmostTimerWindow>();
+            window.Closed += (_, _) => _topmostTimerWindow = null;
+            _topmostTimerWindow = window;
+            _topmostTimerWindow.Show();
         }
     }
 }

@@ -13,13 +13,44 @@
         ap:WindowProperties.ShowSettings="True"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
-        Title="TimerWindow" Height="300" Width="400">
+        Title="TimerWindow" Height="160" Width="270">
     <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding LoadedAsyncCommand}"/>
+        </i:EventTrigger>
         <i:EventTrigger EventName="Closed">
             <i:InvokeCommandAction Command="{Binding ClosedCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
+    <Window.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
+    </Window.Resources>
     <DockPanel>
-        
+        <TextBlock DockPanel.Dock="Top"
+                   Text="Работа/Перерыв"
+                   FontSize="32"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top"
+                   Margin="0,0,0,5"/>
+        <Button DockPanel.Dock="Bottom"
+                HorizontalAlignment="Right"
+                Margin="0,0,2,0"
+                Padding="2"
+                Style="{StaticResource TopmostTimerButtonStyle}"
+                Command="{Binding OpenTopmostTimerWindowCommand}"/>
+        <ToggleButton DockPanel.Dock="Left"
+                      Style="{StaticResource PlayPauseToggleButtonStyle}"
+                      VerticalAlignment="Top"
+                      Command="{Binding PlayPauseTimerCommand}"/>
+        <Button DockPanel.Dock="Right"
+                      Style="{StaticResource NextCycleButtonStyle}"
+                      VerticalAlignment="Top"/>
+        <TextBlock Text="{Binding TimerModel.TimeString}"
+                   FontWeight="Bold"
+                   FontFamily="Times New Roman"
+                   FontSize="40"
+                   HorizontalAlignment="Stretch"
+                   TextAlignment="Center"
+                   VerticalAlignment="Top"/>
     </DockPanel>
 </Window>

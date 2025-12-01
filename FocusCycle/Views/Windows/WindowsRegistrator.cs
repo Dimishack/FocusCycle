@@ -17,6 +17,13 @@ namespace FocusCycle.Views.Windows
             })
             .AddTransient(services =>
             {
+                var viewModel = App.Services.GetRequiredService<TimerViewModel>();
+                var window = new TimerWindow() { DataContext = viewModel };
+                InitializeCenterMainScreen(window);
+                return window;
+            })
+            .AddTransient(services =>
+            {
                 var window = new SettingsWindow()
                 {
                     Owner = App.AcivedWindow,
@@ -26,11 +33,18 @@ namespace FocusCycle.Views.Windows
             })
             .AddTransient(services =>
             {
-                var viewModel = App.Services.GetRequiredService<TimerViewModel>();
-                var window = new TimerWindow() { DataContext = viewModel };
-                InitializeCenterMainScreen(window);
+                var viewModel = App.Services.GetRequiredService<TopmostTimerViewModel>();
+                var activedWindow = App.AcivedWindow;
+                var window = new TopmostTimerWindow
+                {
+                    DataContext = viewModel,
+                    Top = activedWindow.Top + activedWindow.Width / 2,
+                    Left = activedWindow.Left + activedWindow.Height / 2
+                };
+
                 return window;
-            });
+            })
+            ;
 
         private static void InitializeCenterMainScreen(Window window)
         {
