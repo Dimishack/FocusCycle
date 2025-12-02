@@ -13,12 +13,25 @@ namespace FocusCycle.Models
         private readonly System.Timers.Timer _timer;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-        public event EventHandler? EndTimer;
+        public event EventHandler<TimerAction>? TimerActionChanged;
 
         protected virtual void OnPropertyChanged(string propertyName)
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
         public bool IsTimerPause => !_timer.Enabled;
+
+        public bool IsCurrentWorkTimer
+        {
+            get;
+            private set;
+        }
+
+        public string CurrentTimerString => IsCurrentWorkTimer
+            ? "Р а б о т а"
+            : "П е р е р ы в";
+
+        public TimeSpan Work { get; set; }
+        public TimeSpan Break { get; set; }
 
         public byte Hour
         {
@@ -38,29 +51,25 @@ namespace FocusCycle.Models
             private set;
         }
 
-        public string TimeString => $"{Hour:00}:{Minute:00}:{Second:00}";
+        public string TimerString => $"{Hour:00}:{Minute:00}:{Second:00}";
 
-        public void NextTimer(byte hour, byte minute, byte second)
-        {
-            _timer.Stop();
-            Hour = hour;
-            Minute = minute;
-            Second = second;
-            OnPropertyChanged(nameof(TimeString));
-            _timer.Start();
-        }
-
-        #region NextTimer : void - Запуск следующего таймера
+        #region PlayNextTimer : void - Запуск следующего таймера
 
         ///<summary>Запуск следующего таймера</summary>
-        public void NextTimer(TimeSpan time)
+        public void PlayNextTimer()
         {
             _timer.Stop();
+            TimeSpan time = Work;
+            if (IsCurrentWorkTimer)
+                time = Break;
             Hour = (byte)time.Hours;
             Minute = (byte)time.Minutes;
             Second = (byte)time.Seconds;
-            OnPropertyChanged(nameof(TimeString));
+            IsCurrentWorkTimer = !IsCurrentWorkTimer;
+            OnPropertyChanged(nameof(CurrentTimerString));
+            OnPropertyChanged(nameof(TimerString));
             _timer.Start();
+            TimerActionChanged?.Invoke(this, TimerAction.Start);
         }
 
         #endregion
@@ -71,7 +80,10 @@ namespace FocusCycle.Models
         public void PauseTimer()
         {
             if (_timer.Enabled)
+            {
                 _timer.Stop();
+                TimerActionChanged?.Invoke(this, TimerAction.Stop);
+            }
         }
 
         #endregion
@@ -82,7 +94,10 @@ namespace FocusCycle.Models
         public void ResumeTimer()
         {
             if (!_timer.Enabled)
+            {
                 _timer.Start();
+                TimerActionChanged?.Invoke(this, TimerAction.Resume);
+            }
         }
 
         #endregion
@@ -91,6 +106,7 @@ namespace FocusCycle.Models
         {
             _timer = new(1000);
             _timer.Elapsed += Timer_Elapsed;
+            IsCurrentWorkTimer = false;
         }
 
         private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
@@ -107,14 +123,14 @@ namespace FocusCycle.Models
                         second = 0;
                         minute = 0;
                         Hour = 0;
-                        EndTimer?.Invoke(this, EventArgs.Empty);
+                        TimerActionChanged?.Invoke(this, TimerAction.End);
                     }
                     Minute = minute;
                 }
                 Second = second;
             }
 
-            OnPropertyChanged(nameof(TimeString));
+            OnPropertyChanged(nameof(TimerString));
         }
     }
 }

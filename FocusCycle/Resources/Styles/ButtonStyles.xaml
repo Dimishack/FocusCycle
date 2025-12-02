@@ -78,4 +78,23 @@
         <Setter Property="icons:IconImage.Icon" Value="ShareSquare"/>
     </Style>
 
+    <Style TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}"
+           x:Key="TopmostTimerButtonMainStyle">
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Foreground" Value="{StaticResource SolidColorBrush_Marshmallow}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource SolidColorBrush_MarshmallowInChocolate}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Foreground" Value="{StaticResource SolidColorBrush_WhippedCream}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource TopmostTimerButtonMainStyle}"
+           x:Key="CloseTopmostTimerButtonStyle">
+        <Setter Property="icons:IconImage.Icon" Value="SquareXmark"/>
+    </Style>
+
 </ResourceDictionary>

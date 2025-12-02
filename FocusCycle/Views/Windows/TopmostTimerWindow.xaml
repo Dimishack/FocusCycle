@@ -15,17 +15,51 @@
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
         
-        Title="TopmostTimerWindow" Height="110" Width="360">
+        Title="TopmostTimerWindow" Height="110" Width="320">
     <Window.Resources>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
-    <i:Interaction.Behaviors>
-        <cusB:MoveWindowBehavior/>
-    </i:Interaction.Behaviors>
-    <TextBlock Text="22:22:22"
-               FontWeight="Bold"
-               FontSize="96"
-               Opacity="1"
-               VerticalAlignment="Top"
-               HorizontalAlignment="Center"/>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" 
+                   Grid.Column="0" 
+                   Text="{Binding CurrentTimer.CurrentTimerString}"
+                   FontSize="26"
+                   FontWeight="Black"
+                   TextAlignment="Center"
+                   Foreground="{StaticResource SolidColorBrush_Marshmallow}"
+                   VerticalAlignment="Top">
+            <i:Interaction.Behaviors>
+                <cusB:DragMoveWindowBehavior/>
+            </i:Interaction.Behaviors>
+        </TextBlock>
+
+        <Button Grid.Row="0"
+                Grid.Column="1" 
+                Command="{Binding CloseWindowCommand}"
+                Style="{StaticResource CloseTopmostTimerButtonStyle}"/>
+
+        <Viewbox Stretch="Uniform"
+                 Grid.ColumnSpan="2"
+                 Grid.Row="1"
+                 Margin="0,-15,0,0">
+            <TextBlock Text="{Binding CurrentTimer.TimerString}"
+                   Foreground="{StaticResource SolidColorBrush_Marshmallow}"
+                   FontWeight="Bold"
+                   TextAlignment="Center">
+            <i:Interaction.Behaviors>
+                <cusB:TextBlockFlickeringBehavior PlayFlicker="{Binding PlayFlicker}"/>
+                <cusB:DragMoveWindowBehavior/>
+            </i:Interaction.Behaviors>
+            </TextBlock>
+        </Viewbox>
+    </Grid>
 </Window>

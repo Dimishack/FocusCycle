@@ -13,19 +13,11 @@ namespace FocusCycle.ViewModels
     {
         private const string SETTINGS_FILENAME = "Settings.bin";
         private TimerSettings? _settings;
-        private bool _isCurrentWorkTimer;
+
+        private readonly IMessageBus _messageBus;
         private readonly IOpenWindows _openWindows;
 
         #region Properties...
-
-        #region Header : string - Заголовок
-
-        ///<summary>Заголовок</summary>
-        public string Header => _isCurrentWorkTimer
-            ? "Р а б о т а"
-            : "П е р е р ы в";
-
-        #endregion
 
         #region IsTimerPause : bool - Таймер на паузе
 
@@ -41,16 +33,16 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
-        #region TimerModel : TimerModel - Таймер
+        #region CurrentTimer : TimerModel - Таймер
 
         ///<summary>Таймер</summary>
-        private TimerModel _timerModel;
+        private TimerModel _currentTimer;
 
         ///<summary>Таймер</summary>
-        public TimerModel TimerModel
+        public TimerModel CurrentTimer
         {
-            get => _timerModel;
-            set => Set(ref _timerModel, value);
+            get => _currentTimer;
+            set => Set(ref _currentTimer, value);
         }
 
         #endregion
@@ -73,9 +65,9 @@ namespace FocusCycle.ViewModels
         {
             _settings = await ReadSettingsAsync();
             ((Command)PlayNextCycleCommand).OnRaiseCanExecuted();
-            _isCurrentWorkTimer = true;
-            OnPropertyChanged(nameof(Header));
-            _timerModel.NextTimer(_settings.WorkTimer);
+            _currentTimer.Work = _settings.WorkTimer;
+            _currentTimer.Break = _settings.BreakTimer;
+            _currentTimer.PlayNextTimer();
         }
 
         #endregion
@@ -114,14 +106,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - запустить следующий цикл</summary>
         private void OnPlayNextCycleCommandExecuted(object? p)
         {
-            if (_settings is null) return;
-            TimeSpan nextTimer = _settings.WorkTimer;
-            if(_isCurrentWorkTimer)
-                nextTimer = _settings.BreakTimer;
-
-            _isCurrentWorkTimer = !_isCurrentWorkTimer;
-            OnPropertyChanged(nameof(Header));
-            _timerModel.NextTimer(nextTimer);
+            _currentTimer.PlayNextTimer();
             IsTimerPause = false;
         }
 
@@ -139,9 +124,9 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - запустить/остановить таймер</summary>
         private void OnPlayPauseTimerCommandExecuted(object? p)
         {
-            if (_timerModel.IsTimerPause)
-                _timerModel.ResumeTimer();
-            else _timerModel.PauseTimer();
+            if (_currentTimer.IsTimerPause)
+                _currentTimer.ResumeTimer();
+            else _currentTimer.PauseTimer();
         }
 
         #endregion
@@ -162,7 +147,10 @@ namespace FocusCycle.ViewModels
 
         ///<summary>Логика выполнения - открыть окно с передним таймером</summary>
         private void OnOpenTopmostTimerWindowCommandExecuted(object? p)
-            => _openWindows.OpenTopmostTimerWindow();
+        {
+            _openWindows.OpenTopmostTimerWindow();
+            _messageBus.Send(this, _currentTimer);
+        }
 
         #endregion
 
@@ -202,10 +190,11 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
-        public TimerViewModel(IOpenWindows openWindows)
+        public TimerViewModel(IMessageBus messageBus, IOpenWindows openWindows)
         {
+            _messageBus = messageBus;
             _openWindows = openWindows;
-            _timerModel = new TimerModel();
+            _currentTimer = new TimerModel();
         }
 
     }

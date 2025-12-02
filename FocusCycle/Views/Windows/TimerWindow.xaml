@@ -13,7 +13,7 @@
         ap:WindowProperties.ShowSettings="True"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
-        Title="TimerWindow" Height="160" Width="270">
+        Title="TimerWindow" Height="120" Width="270">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedAsyncCommand}"/>
@@ -26,19 +26,27 @@
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
     <DockPanel>
-        <TextBlock DockPanel.Dock="Top"
-                   Text="{Binding Header}"
-                   FontSize="32"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Top"
-                   FontWeight="Bold"
-                   Margin="0,0,0,5"/>
-        <Button DockPanel.Dock="Bottom"
-                HorizontalAlignment="Right"
-                Margin="0,0,2,0"
-                Padding="2"
-                Style="{StaticResource TopmostTimerButtonStyle}"
-                Command="{Binding OpenTopmostTimerWindowCommand}"/>
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="35"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="35"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="1"
+                       Text="{Binding CurrentTimer.CurrentTimerString}"
+                       FontSize="28"
+                       FontWeight="Black"
+                       TextAlignment="Center"
+                       Margin="0,0,0,0"/>
+            <Button Grid.Column="2"
+                    HorizontalAlignment="Center"
+                    Style="{StaticResource TopmostTimerButtonStyle}"
+                    Command="{Binding OpenTopmostTimerWindowCommand}"/>
+        </Grid>
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    DockPanel.Dock="Top">
+        </StackPanel>
         <ToggleButton DockPanel.Dock="Left"
                       Style="{StaticResource PlayPauseToggleButtonStyle}"
                       VerticalAlignment="Top"
@@ -48,7 +56,7 @@
                 Style="{StaticResource NextCycleButtonStyle}"
                 VerticalAlignment="Top"
                 Command="{Binding PlayNextCycleCommand}"/>
-        <TextBlock Text="{Binding TimerModel.TimeString}"
+        <TextBlock Text="{Binding CurrentTimer.TimerString}"
                    FontWeight="Bold"
                    FontSize="40"
                    HorizontalAlignment="Stretch"
