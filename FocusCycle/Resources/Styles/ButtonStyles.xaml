@@ -13,7 +13,8 @@
                     <Border Margin="{TemplateBinding Margin}"
                             Background="{TemplateBinding Background}"
                             Width="{TemplateBinding Width}"
-                            Height="{TemplateBinding Height}">
+                            Height="{TemplateBinding Height}"
+                            CornerRadius="10">
                         <icons:IconImage Icon="{TemplateBinding icons:IconImage.Icon}"
                                          Foreground="{TemplateBinding Foreground}"
                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
@@ -29,6 +30,9 @@
             </Trigger>
             <Trigger Property="IsPressed" Value="True">
                 <Setter Property="Foreground" Value="{StaticResource SolidColorBrush_MarshmallowInChocolate}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Opacity" Value="0.5"/>
             </Trigger>
         </Style.Triggers>
     </Style>
@@ -76,6 +80,21 @@
            x:Key="TopmostTimerButtonStyle">
         <Setter Property="Width" Value="22"/>
         <Setter Property="icons:IconImage.Icon" Value="ShareSquare"/>
+    </Style>
+
+    <Style TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}"
+           x:Key="CheckCancelButtonStyle">
+        <Setter Property="Height" Value="30"/>
+        <Setter Property="Padding" Value="5"/>
+        <Setter Property="Background" Value="{StaticResource SolidColorBrush_MarshmallowInChocolate}"/>
+        <Style.Triggers>
+            <Trigger Property="IsDefault" Value="True">
+                <Setter Property="icons:IconImage.Icon" Value="Check"/>
+            </Trigger>
+            <Trigger Property="IsCancel" Value="True">
+                <Setter Property="icons:IconImage.Icon" Value="Xmark"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style TargetType="Button" BasedOn="{StaticResource ButtonMainStyle}"

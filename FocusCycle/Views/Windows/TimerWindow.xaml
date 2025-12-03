@@ -10,10 +10,11 @@
         xmlns:ap="clr-namespace:FocusCycle.Infrasctructure.AttachedProperties"
         
         d:DataContext="{d:DesignInstance {x:Type vm:TimerViewModel}}"
-        ap:WindowProperties.ShowSettings="True"
+        ap:WindowProperties.ShowWindowManagerButtons="True"
+        ap:WindowProperties.OpenSettingsCommand="{Binding OpenSettingsCommand}"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
-        Title="TimerWindow" Height="120" Width="270">
+        Title="" Height="120" Width="270">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedAsyncCommand}"/>

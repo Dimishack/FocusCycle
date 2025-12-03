@@ -6,12 +6,9 @@ namespace FocusCycle.Models
     public class TimerSettings
     {
         [Key(0)]
-        public bool IsAutorun { get; set; } = false;
+        public TimeSpan WorkTime { get; set; } = TimeSpan.FromMinutes(80);
 
         [Key(1)]
-        public TimeSpan WorkTimer { get; set; } = TimeSpan.FromMinutes(80);
-
-        [Key(2)]
-        public TimeSpan BreakTimer { get; set; } = TimeSpan.FromSeconds(15);
+        public TimeSpan BreakTime { get; set; } = TimeSpan.FromSeconds(15);
     }
 }

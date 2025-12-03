@@ -1,0 +1,47 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ice="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+    <StreamGeometry x:Key="CheckMark" ice:Freeze="True">
+        M1,4 L4.5,8 L9,1
+    </StreamGeometry>
+    <StreamGeometry x:Key="XMark" ice:Freeze="True">
+        M1,1 L9,9 M1,9 L9,1
+    </StreamGeometry>
+
+    <Style TargetType="CheckBox" x:Key="CheckBoxMainStyle">
+        <Setter Property="Background" Value="{StaticResource SolidColorBrush_Marshmallow}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource SolidColorBrush_LightMarshmallow}"/>
+        <Setter Property="BorderThickness" Value="2"/>
+        <Setter Property="Foreground" Value="{StaticResource SolidColorBrush_DarkChocolate}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Margin="{TemplateBinding Margin}"
+                            Width="16"
+                            Height="16">
+                        <Path x:Name="mark" Data="{StaticResource XMark}"
+                              Stroke="{TemplateBinding Foreground}"
+                              Margin="1"
+                              StrokeThickness="2"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="mark"
+                                    Property="Data"
+                                    Value="{StaticResource CheckMark}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="BorderBrush" Value="{StaticResource SolidColorBrush_MarshmallowInChocolate}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+</ResourceDictionary>

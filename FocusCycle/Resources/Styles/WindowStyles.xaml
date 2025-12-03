@@ -10,7 +10,7 @@
         <Setter Property="ResizeMode" Value="CanMinimize"/>
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome CaptionHeight="30"
+                <WindowChrome CaptionHeight="23"
                               CornerRadius="10"
                               UseAeroCaptionButtons="False"
                               ResizeBorderThickness="5"
@@ -24,19 +24,30 @@
                     <Border x:Name="PART_Border" Background="{StaticResource SolidColorBrush_DarkChocolate}" Padding="7,5">
                         <Grid x:Name="PART_MainGrid">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="23"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <UniformGrid Rows="1" Grid.Row="0" HorizontalAlignment="Right"
-                                         Margin="0,0,0,3">
-                                <Button Style="{StaticResource SettingButtonStyle}"
-                                        Visibility="{Binding RelativeSource={RelativeSource AncestorType=Window}, 
-                                            Path=(ap:WindowProperties.ShowSettings), 
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="0"
+                                       Grid.Column="0"
+                                       HorizontalAlignment="Center"
+                                       Text="{TemplateBinding Title}"
+                                       Margin="0,-3,0,2"
+                                       WindowChrome.IsHitTestVisibleInChrome="False"/>
+                            <UniformGrid Rows="1" 
+                                         Grid.Row="0"
+                                         Grid.Column="1"
+                                         HorizontalAlignment="Right"
+                                         Margin="0,-3,0,2"
+                                         Visibility="{Binding RelativeSource={RelativeSource AncestorType=Window},
+                                            Path=(ap:WindowProperties.ShowWindowManagerButtons),
                                             Converter={StaticResource BooleanToVisibilityConverte}}">
-                                    <Button.Command>
-                                        <c:OpenSettingsCommand/>
-                                    </Button.Command>
-                                </Button>
+                                <Button Style="{StaticResource SettingButtonStyle}"
+                                        Command="{Binding RelativeSource={RelativeSource AncestorType=Window},
+                                            Path=(ap:WindowProperties.OpenSettingsCommand)}"/>
                                 <Button Style="{StaticResource MinimizeWindowButtonStyle}">
                                     <Button.Command>
                                         <c:MinimizeWindowCommand/>
@@ -48,7 +59,9 @@
                                     </Button.Command>
                                 </Button>
                             </UniformGrid>
-                            <Border Grid.Row="1" Background="{StaticResource SolidColorBrush_HotChocolate}"
+                            <Border Grid.Row="1"
+                                    Grid.ColumnSpan="2"
+                                    Background="{StaticResource SolidColorBrush_HotChocolate}"
                                     CornerRadius="15">
                                 <AdornerDecorator KeyboardNavigation.IsTabStop="False">
                                     <ContentPresenter KeyboardNavigation.TabNavigation="Cycle"

@@ -1,25 +1,45 @@
 ﻿using System.Windows;
+using System.Windows.Input;
 
 namespace FocusCycle.Infrasctructure.AttachedProperties
 {
     public class WindowProperties : DependencyObject
     {
-        #region ShowSettings : bool - Отобразить настройки
+        #region ShowWindowManagerButtons : bool - Отобразить кнопки управления окном
 
-        ///<summary> Отобразить настройки (DependencyProperty). </summary>
-        public static readonly DependencyProperty ShowSettingsProperty =
-            DependencyProperty.Register("ShowSettings",
+        ///<summary> Отобразить кнопки управления окном (DependencyProperty). </summary>
+        public static readonly DependencyProperty ShowWindowManagerButtonsProperty =
+            DependencyProperty.Register("ShowWindowManagerButtons",
                     typeof(bool),
                     typeof(WindowProperties),
                     new PropertyMetadata(false));
 
-        public static void SetShowSettings(DependencyObject element, bool value)
-            => element.SetValue(ShowSettingsProperty, value);
+        public static void SetShowWindowManagerButtons(DependencyObject element, bool value)
+            => element.SetValue(ShowWindowManagerButtonsProperty, value);
 
-        public static bool GetShowSettings(DependencyObject element)
-            => (bool)element.GetValue(ShowSettingsProperty);
+        public static bool GetShowWindowManagerButtons(DependencyObject element)
+            => (bool)element.GetValue(ShowWindowManagerButtonsProperty);
 
         #endregion
+
+
+        #region OpenSettingsCommand : ICommand? - Открыть настройки
+
+        ///<summary> Открыть настройки (DependencyProperty). </summary>
+        public static readonly DependencyProperty OpenSettingsCommandProperty =
+            DependencyProperty.Register("OpenSettingsCommand",
+                    typeof(ICommand),
+                    typeof(WindowProperties),
+                    new PropertyMetadata(null));
+
+        public static void SetOpenSettingsCommand(DependencyObject element, ICommand? command)
+            => element.SetValue(OpenSettingsCommandProperty, command);
+
+        public static ICommand? GetOpenSettingsCommand(DependencyObject element)
+            =>(ICommand?)element.GetValue(OpenSettingsCommandProperty);
+
+        #endregion
+
 
     }
 }

@@ -8,6 +8,7 @@ namespace FocusCycle.ViewModels.RLViewModels
             .AddTransient<StartWViewModel>()
             .AddTransient<TimerViewModel>()
             .AddTransient<TopmostTimerViewModel>()
+            .AddTransient<SettingsViewModel>()
             ;
     }
 }

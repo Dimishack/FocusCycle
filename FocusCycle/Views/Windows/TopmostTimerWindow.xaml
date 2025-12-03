@@ -14,8 +14,7 @@
         
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
-        
-        Title="TopmostTimerWindow" Height="110" Width="320">
+        Height="100" Width="320">
     <Window.Resources>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
@@ -28,25 +27,6 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-
-        <TextBlock Grid.Row="0" 
-                   Grid.Column="0" 
-                   Text="{Binding CurrentTimer.CurrentTimerString}"
-                   FontSize="26"
-                   FontWeight="Black"
-                   TextAlignment="Center"
-                   Foreground="{StaticResource SolidColorBrush_Marshmallow}"
-                   VerticalAlignment="Top">
-            <i:Interaction.Behaviors>
-                <cusB:DragMoveWindowBehavior/>
-            </i:Interaction.Behaviors>
-        </TextBlock>
-
-        <Button Grid.Row="0"
-                Grid.Column="1" 
-                Command="{Binding CloseWindowCommand}"
-                Style="{StaticResource CloseTopmostTimerButtonStyle}"/>
-
         <Viewbox Stretch="Uniform"
                  Grid.ColumnSpan="2"
                  Grid.Row="1"
@@ -61,5 +41,21 @@
             </i:Interaction.Behaviors>
             </TextBlock>
         </Viewbox>
+        <TextBlock Grid.Row="0" 
+                   Grid.Column="0" 
+                   Text="{Binding CurrentTimer.CurrentTimerString}"
+                   FontSize="28"
+                   FontWeight="Black"
+                   TextAlignment="Center"
+                   Foreground="{StaticResource SolidColorBrush_Marshmallow}">
+            <i:Interaction.Behaviors>
+                <cusB:DragMoveWindowBehavior/>
+            </i:Interaction.Behaviors>
+        </TextBlock>
+
+        <Button Grid.Row="0"
+                Grid.Column="1" 
+                Command="{Binding CloseWindowCommand}"
+                Style="{StaticResource CloseTopmostTimerButtonStyle}"/>
     </Grid>
 </Window>

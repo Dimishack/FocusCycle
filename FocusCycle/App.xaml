@@ -9,6 +9,8 @@
                 <ResourceDictionary Source="Resources/Colors.xaml"/>
 
                 <ResourceDictionary Source="Resources/Styles/TextBlockStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/CheckBoxStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/TextBoxStyles.xaml"/>
                 
                 <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/ToggleButtonStyles.xaml"/>

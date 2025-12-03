@@ -24,15 +24,6 @@ namespace FocusCycle.Views.Windows
             })
             .AddTransient(services =>
             {
-                var window = new SettingsWindow()
-                {
-                    Owner = App.AcivedWindow,
-                    WindowStartupLocation = WindowStartupLocation.CenterOwner
-                };
-                return window;
-            })
-            .AddTransient(services =>
-            {
                 var viewModel = App.Services.GetRequiredService<TopmostTimerViewModel>();
                 var activedWindow = App.AcivedWindow;
                 var window = new TopmostTimerWindow
@@ -42,6 +33,17 @@ namespace FocusCycle.Views.Windows
                     Left = activedWindow.Left + activedWindow.Height / 2
                 };
 
+                return window;
+            })
+            .AddTransient(services =>
+            {
+                var viewModel = App.Services.GetRequiredService<SettingsViewModel>();
+                var window = new SettingsWindow()
+                {
+                    DataContext = viewModel,
+                    Owner = App.AcivedWindow,
+                    WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                };
                 return window;
             })
             ;

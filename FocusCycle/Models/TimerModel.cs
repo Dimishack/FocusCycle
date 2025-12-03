@@ -33,25 +33,51 @@ namespace FocusCycle.Models
         public TimeSpan Work { get; set; }
         public TimeSpan Break { get; set; }
 
-        public byte Hour
+        public byte Hours
         {
             get;
             private set;
         }
 
-        public byte Minute
+        public byte Minutes
         {
             get;
             private set;
         }
 
-        public byte Second
+        public byte Seconds
         {
             get;
             private set;
         }
 
-        public string TimerString => $"{Hour:00}:{Minute:00}:{Second:00}";
+        public string TimerString => $"{Hours:00}:{Minutes:00}:{Seconds:00}";
+
+        #region ReloadTiemr : void - перезагрузить таймер
+
+        ///<summary>перезагрузить таймер</summary>
+        public void ReloadTiemr()
+        {
+            bool isPause = IsTimerPause;
+            _timer.Stop();
+            int hours = Break.Hours;
+            int minutes = Break.Minutes;
+            int seconds = Break.Seconds;
+            if(IsCurrentWorkTimer)
+            {
+                hours = Work.Hours;
+                minutes = Work.Minutes;
+                seconds = Work.Seconds;
+            }
+            Hours = (byte)hours;
+            Minutes = (byte)minutes;
+            Seconds = (byte)seconds;
+            if(!isPause)
+                _timer.Start();
+            OnPropertyChanged(nameof(TimerString));
+        }
+
+        #endregion
 
         #region PlayNextTimer : void - Запуск следующего таймера
 
@@ -62,9 +88,9 @@ namespace FocusCycle.Models
             TimeSpan time = Work;
             if (IsCurrentWorkTimer)
                 time = Break;
-            Hour = (byte)time.Hours;
-            Minute = (byte)time.Minutes;
-            Second = (byte)time.Seconds;
+            Hours = (byte)time.Hours;
+            Minutes = (byte)time.Minutes;
+            Seconds = (byte)time.Seconds;
             IsCurrentWorkTimer = !IsCurrentWorkTimer;
             OnPropertyChanged(nameof(CurrentTimerString));
             OnPropertyChanged(nameof(TimerString));
@@ -111,23 +137,23 @@ namespace FocusCycle.Models
 
         private void Timer_Elapsed(object? sender, ElapsedEventArgs e)
         {
-            if (--Second == byte.MaxValue)
+            if (--Seconds == byte.MaxValue)
             {
                 byte second = 59;
-                if (--Minute == byte.MaxValue)
+                if (--Minutes == byte.MaxValue)
                 {
                     byte minute = 59;
-                    if (--Hour == byte.MaxValue)
+                    if (--Hours == byte.MaxValue)
                     {
                         _timer.Stop();
                         second = 0;
                         minute = 0;
-                        Hour = 0;
+                        Hours = 0;
                         TimerActionChanged?.Invoke(this, TimerAction.End);
                     }
-                    Minute = minute;
+                    Minutes = minute;
                 }
-                Second = second;
+                Seconds = second;
             }
 
             OnPropertyChanged(nameof(TimerString));

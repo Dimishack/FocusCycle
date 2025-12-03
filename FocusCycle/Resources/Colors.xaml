@@ -6,6 +6,6 @@
     <SolidColorBrush x:Key="SolidColorBrush_HotChocolate" Color="#8B5A3C" ice:Freeze="True"/>
     <SolidColorBrush x:Key="SolidColorBrush_WhippedCream" Color="#D7CCC8" ice:Freeze="True"/>
     <SolidColorBrush x:Key="SolidColorBrush_Marshmallow" Color="#FFB74D" ice:Freeze="True"/>
-    <SolidColorBrush x:Key="SolidColorBrush_LightMarshmallow" Color="#cc923d" ice:Freeze="True"/>
-    <SolidColorBrush x:Key="SolidColorBrush_MarshmallowInChocolate" Color="#c58337" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="SolidColorBrush_LightMarshmallow" Color="#D6A763" ice:Freeze="True"/>
+    <SolidColorBrush x:Key="SolidColorBrush_MarshmallowInChocolate" Color="#C58337" ice:Freeze="True"/>
 </ResourceDictionary>

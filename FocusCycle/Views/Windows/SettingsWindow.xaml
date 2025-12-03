@@ -4,11 +4,71 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
-        Style="{StaticResource WindowMainStyle}"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="250" Width="400">
-    <Grid>
-        <TextBlock Text="Settings" HorizontalAlignment="Center"
-                   VerticalAlignment="Center"/>
-    </Grid>
+        Style="{StaticResource WindowMainStyle}"
+        
+        xmlns:vm="clr-namespace:FocusCycle.ViewModels"
+        d:DataContext="{d:DesignInstance {x:Type vm:SettingsViewModel}, IsDesignTimeCreatable=True}"
+        Title="Настройки" Height="160" Width="300">
+    <Window.Resources>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}">
+            <Style.Triggers>
+                <Trigger Property="Grid.Column" Value="0">
+                    <Setter Property="TextAlignment"
+                            Value="Right"/>
+                    <Setter Property="Margin"
+                            Value="4,2"/>
+                    <Setter Property="FontSize"
+                            Value="18"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <UniformGrid Rows="1"
+                     DockPanel.Dock="Bottom"
+                     Margin="0,0,0,3">
+            <Button Style="{StaticResource CheckCancelButtonStyle}"
+                    IsDefault="True"
+                    Command="{Binding EditSettingsCommand}"/>
+            <Button Style="{StaticResource CheckCancelButtonStyle}"
+                    IsCancel="True"
+                    Command="{Binding CancelEditCommand}"/>
+        </UniformGrid>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Column="0"
+                   Grid.Row="0"
+                   Text="Автозапуск:"/>
+            <CheckBox Grid.Column="1"
+                      Grid.Row="0"
+                      HorizontalAlignment="Left"
+                      Style="{StaticResource CheckBoxMainStyle}"
+                      IsChecked="{Binding IsAutorun}"/>
+
+            <TextBlock Grid.Column="0"
+                       Grid.Row="1"
+                       Text="Время работы:"/>
+            <TextBox Grid.Column="1"
+                     Grid.Row="1"
+                     Style="{StaticResource TextBoxMainStyle}"
+                     Text="{Binding WorkTime, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Column="0"
+                       Grid.Row="2"
+                       Text="Время перерыва:"/>
+            <TextBox Grid.Column="1"
+                     Grid.Row="2"
+                     Style="{StaticResource TextBoxMainStyle}"
+                     Text="{Binding BreakTime, UpdateSourceTrigger=PropertyChanged}"/>
+        </Grid>
+    </DockPanel>
 </Window>

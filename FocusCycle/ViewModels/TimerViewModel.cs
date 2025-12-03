@@ -5,16 +5,20 @@ using FocusCycle.Services.Interfaces;
 using FocusCycle.ViewModels.Base;
 using MessagePack;
 using System.IO;
+using System.Windows;
 using System.Windows.Input;
 
 namespace FocusCycle.ViewModels
 {
     internal class TimerViewModel : ViewModel
     {
-        private const string SETTINGS_FILENAME = "Settings.bin";
+        private readonly string _settingsPath = Path.Combine(
+            Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty, 
+            "Settings.bin");
         private TimerSettings? _settings;
 
         private readonly IMessageBus _messageBus;
+        private readonly IDisposable _getEdittedSettingsSubscription;
         private readonly IOpenWindows _openWindows;
 
         #region Properties...
@@ -65,8 +69,8 @@ namespace FocusCycle.ViewModels
         {
             _settings = await ReadSettingsAsync();
             ((Command)PlayNextCycleCommand).OnRaiseCanExecuted();
-            _currentTimer.Work = _settings.WorkTimer;
-            _currentTimer.Break = _settings.BreakTimer;
+            _currentTimer.Work = _settings.WorkTime;
+            _currentTimer.Break = _settings.BreakTime;
             _currentTimer.PlayNextTimer();
         }
 
@@ -84,6 +88,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - закрытие</summary>
         private async Task OnClosedCommandExecuted(object? p)
         {
+            _getEdittedSettingsSubscription.Dispose();
             if (_settings is not null)
                 await WriteSettingsAsync(_settings);
             App.Current.Shutdown();
@@ -154,6 +159,30 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
+        #region OpenSettingsCommand - Команда - открыть настройки
+
+        ///<summary>Команда - открыть настройки</summary>
+        private ICommand? _openSettingsCommand;
+
+        ///<summary>Команда - открыть настройки</summary>
+        public ICommand OpenSettingsCommand => _openSettingsCommand
+            ??= new LambdaCommand(OnOpenSettingsCommandExecuted, CanOpenSettingsCommandExecute);
+
+        ///<summary>Проверка возможности выполнения - открыть настройки</summary>
+        private bool CanOpenSettingsCommandExecute(object? p) => true;
+
+        ///<summary>Логика выполнения - открыть настройки</summary>
+        private void OnOpenSettingsCommandExecuted(object? p)
+        {
+            if(_settings is not null)
+            {
+                _openWindows.OpenSettingsWindow();
+                _messageBus.Send(this, _settings);
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Methods...
@@ -166,7 +195,7 @@ namespace FocusCycle.ViewModels
             var settings = new TimerSettings();
             try
             {
-                using (var fs = new FileStream(SETTINGS_FILENAME, FileMode.Open))
+                using (var fs = new FileStream(_settingsPath, FileMode.Open))
                     settings = await MessagePackSerializer.DeserializeAsync<TimerSettings>(fs);
             }
             catch (Exception)
@@ -182,8 +211,35 @@ namespace FocusCycle.ViewModels
         ///<summary>Запись файла с настройками</summary>
         private async Task WriteSettingsAsync(TimerSettings settings)
         {
-            using (var fs = new FileStream(SETTINGS_FILENAME, FileMode.Create))
+            using (var fs = new FileStream(_settingsPath, FileMode.Create))
                 await MessagePackSerializer.SerializeAsync(fs, settings);
+        }
+
+        #endregion
+
+        #endregion
+
+        #region Subscrtiprions...
+
+        #region GetEdittedSettings : void - Получить измененные настройки
+
+        ///<summary>Получить измененные настройки</summary>
+        private void GetEdittedSettings(TimerSettings? edittedSettings)
+        {
+            if (edittedSettings is null 
+                || _settings is null) return;
+            _settings.WorkTime = edittedSettings.WorkTime;
+            _settings.BreakTime = edittedSettings.BreakTime;
+            if(MessageBox.Show("Изменить текущие времена на измененные?", 
+                "FocusCycle", 
+                MessageBoxButton.YesNo, 
+                MessageBoxImage.Question)
+                == MessageBoxResult.Yes)
+            {
+                _currentTimer.Work = edittedSettings.WorkTime;
+                _currentTimer.Break = edittedSettings.BreakTime;
+                _currentTimer.ReloadTiemr();
+            }
         }
 
         #endregion
@@ -194,6 +250,8 @@ namespace FocusCycle.ViewModels
         {
             _messageBus = messageBus;
             _openWindows = openWindows;
+            _getEdittedSettingsSubscription = messageBus
+                .RegisterHandler<TimerSettings?>(GetEdittedSettings);
             _currentTimer = new TimerModel();
         }
 

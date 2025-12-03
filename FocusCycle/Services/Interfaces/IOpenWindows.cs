@@ -1,8 +1,9 @@
-﻿namespace FocusCycle.Services.Interfaces
+﻿using FocusCycle.Models;
+
+namespace FocusCycle.Services.Interfaces
 {
     interface IOpenWindows
     {
-        bool IsOpenSettingWindow { get; }
         bool IsOpenTopmostTimerWindow { get; }
 
         void OpenSettingsWindow();
