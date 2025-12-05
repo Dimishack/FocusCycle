@@ -149,7 +149,8 @@ namespace FocusCycle.Models
                         second = 0;
                         minute = 0;
                         Hours = 0;
-                        TimerActionChanged?.Invoke(this, TimerAction.End);
+                        App.Current.Dispatcher.Invoke(() => TimerActionChanged?.Invoke(this, TimerAction.End));
+                        
                     }
                     Minutes = minute;
                 }

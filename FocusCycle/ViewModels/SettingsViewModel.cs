@@ -75,6 +75,43 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
+        #region Volume : double - Громкость
+
+        ///<summary>Громкость</summary>
+        private double _volume;
+
+        ///<summary>Громкость</summary>
+        public double Volume
+        {
+            get => _volume;
+            set
+            {
+                if(!Set(ref _volume, value)) return;
+                VolumeProcent = value * 100.0;
+                ((Command)EditSettingsCommand).OnRaiseCanExecuted();
+            }
+        }
+
+        #endregion
+
+        #region VolumeProcent : double - Громкость в процентах
+
+        ///<summary>Громкость в процентах</summary>
+        private double _volumeProcent;
+
+        ///<summary>Громкость в процентах</summary>
+        public double VolumeProcent
+        {
+            get => _volumeProcent;
+            set
+            {
+                if(!Set(ref _volumeProcent, value)) return;
+                Volume = value / 100.0;
+            }
+        }
+
+        #endregion
+
         #endregion
 
         #region Commands...
@@ -93,7 +130,8 @@ namespace FocusCycle.ViewModels
             => _edittingSettings is not null
             && (_currentAutorun != _isAutorun
              || _edittingSettings.WorkTime != _workTime
-             || _edittingSettings.BreakTime != _breakTime);
+             || _edittingSettings.BreakTime != _breakTime
+             || _edittingSettings.Volume != _volume);
 
         ///<summary>Логика выполнения - изменить настройки</summary>
         private void OnEditSettingsCommandExecuted(object? p)
@@ -102,9 +140,10 @@ namespace FocusCycle.ViewModels
             {
                 WorkTime = _workTime,
                 BreakTime = _breakTime,
+                Volume = _volume,
             };
             if (_currentAutorun != _isAutorun)
-                UpdateRegistry(_isAutorun);
+                UpdateRegistry(!_isAutorun);
             SendEdittingSettings(editiingSettings);
             CloseWindow();
         }
@@ -138,7 +177,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Обновить реестр</summary>
         private void UpdateRegistry(bool isDelete)
         {
-            using (var registryKey = Registry.CurrentUser.OpenSubKey(REGISTRYKEY_PATH))
+            using (var registryKey = Registry.CurrentUser.OpenSubKey(REGISTRYKEY_PATH, true))
             {
                 if (isDelete)
                     registryKey?.DeleteValue(REGISTRYNAME);
@@ -191,6 +230,7 @@ namespace FocusCycle.ViewModels
             IsAutorun = _currentAutorun;
             WorkTime = edittingSettings.WorkTime;
             BreakTime = edittingSettings.BreakTime;
+            Volume = edittingSettings.Volume;
         }
 
         #endregion

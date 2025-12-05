@@ -13,9 +13,10 @@ namespace FocusCycle.ViewModels
     internal class TimerViewModel : ViewModel
     {
         private readonly string _settingsPath = Path.Combine(
-            Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty, 
+            Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty,
             "Settings.bin");
         private TimerSettings? _settings;
+        private MediaModel _media;
 
         private readonly IMessageBus _messageBus;
         private readonly IDisposable _getEdittedSettingsSubscription;
@@ -67,11 +68,29 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - загрузка</summary>
         private async Task OnLoadedCommandExecuted(object? p)
         {
+            _media = new MediaModel();
+
             _settings = await ReadSettingsAsync();
             ((Command)PlayNextCycleCommand).OnRaiseCanExecuted();
             _currentTimer.Work = _settings.WorkTime;
             _currentTimer.Break = _settings.BreakTime;
+            _currentTimer.TimerActionChanged += _currentTimer_TimerActionChanged;
             _currentTimer.PlayNextTimer();
+        }
+
+        private void _currentTimer_TimerActionChanged(object? sender, TimerAction e)
+        {
+            switch (e)
+            {
+                case TimerAction.Start:
+                    _media.Stop();
+                    break;
+                case TimerAction.End:
+                    _media.Play();
+                    break;
+                default:
+                    break;
+            }
         }
 
         #endregion
@@ -88,6 +107,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - закрытие</summary>
         private async Task OnClosedCommandExecuted(object? p)
         {
+            _media?.Dispose();
             _getEdittedSettingsSubscription.Dispose();
             if (_settings is not null)
                 await WriteSettingsAsync(_settings);
@@ -174,7 +194,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - открыть настройки</summary>
         private void OnOpenSettingsCommandExecuted(object? p)
         {
-            if(_settings is not null)
+            if (_settings is not null)
             {
                 _openWindows.OpenSettingsWindow();
                 _messageBus.Send(this, _settings);
@@ -226,13 +246,15 @@ namespace FocusCycle.ViewModels
         ///<summary>Получить измененные настройки</summary>
         private void GetEdittedSettings(TimerSettings? edittedSettings)
         {
-            if (edittedSettings is null 
+            if (edittedSettings is null
                 || _settings is null) return;
             _settings.WorkTime = edittedSettings.WorkTime;
             _settings.BreakTime = edittedSettings.BreakTime;
-            if(MessageBox.Show("Изменить текущие времена на измененные?", 
-                "FocusCycle", 
-                MessageBoxButton.YesNo, 
+            _settings.Volume = edittedSettings.Volume;
+            _media.Volume = edittedSettings.Volume;
+            if (MessageBox.Show("Изменить текущие времена на измененные?",
+                "FocusCycle",
+                MessageBoxButton.YesNo,
                 MessageBoxImage.Question)
                 == MessageBoxResult.Yes)
             {

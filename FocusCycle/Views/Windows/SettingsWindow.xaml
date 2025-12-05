@@ -7,10 +7,14 @@
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
         
+        xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
+        
         xmlns:vm="clr-namespace:FocusCycle.ViewModels"
         d:DataContext="{d:DesignInstance {x:Type vm:SettingsViewModel}, IsDesignTimeCreatable=True}"
-        Title="Настройки" Height="160" Width="300">
+        Title="Настройки" Height="180" Width="300">
     <Window.Resources>
+        <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxMainStyle}"/>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}">
             <Style.Triggers>
                 <Trigger Property="Grid.Column" Value="0">
@@ -44,6 +48,7 @@
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Column="0"
                    Grid.Row="0"
@@ -59,7 +64,6 @@
                        Text="Время работы:"/>
             <TextBox Grid.Column="1"
                      Grid.Row="1"
-                     Style="{StaticResource TextBoxMainStyle}"
                      Text="{Binding WorkTime, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Grid.Column="0"
@@ -67,8 +71,33 @@
                        Text="Время перерыва:"/>
             <TextBox Grid.Column="1"
                      Grid.Row="2"
-                     Style="{StaticResource TextBoxMainStyle}"
                      Text="{Binding BreakTime, UpdateSourceTrigger=PropertyChanged}"/>
+
+            <TextBlock Grid.Column="0"
+                       Grid.Row="3"
+                       Text="Громкость:"/>
+            <DockPanel Grid.Column="1"
+                       Grid.Row="3">
+                <TextBox DockPanel.Dock="Right"
+                         Width="30"
+                         Text="{Binding VolumeProcent, 
+                            StringFormat='{}{0:F0}',
+                            UpdateSourceTrigger=PropertyChanged}">
+                    <i:Interaction.Behaviors>
+                        <cusB:OnlyDigitsBehavior MaxValue="100"/>
+                    </i:Interaction.Behaviors>
+                </TextBox>
+                <Slider Minimum="0"
+                        Maximum="1"
+                        VerticalAlignment="Center"
+                        Margin="1,0"
+                        LargeChange="0.1"
+                        SmallChange="0.1"
+                        IsSnapToTickEnabled="True"
+                        TickFrequency="0.01"
+                        Value="{Binding Volume}"
+                        Style="{StaticResource SliderMainStyle}"/>
+            </DockPanel>
         </Grid>
     </DockPanel>
 </Window>

@@ -2,9 +2,11 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:FocusCycle"
+             xmlns:sys="clr-namespace:System;assembly=netstandard"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
         <ResourceDictionary>
+            <sys:Uri x:Key="Notification">pack://application:,,,/Resources/Rington.wav</sys:Uri>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="Resources/Colors.xaml"/>
 
@@ -13,6 +15,7 @@
                 <ResourceDictionary Source="Resources/Styles/TextBoxStyles.xaml"/>
                 
                 <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
+                <ResourceDictionary Source="Resources/Styles/SliderStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/ToggleButtonStyles.xaml"/>
                 
                 <ResourceDictionary Source="Resources/Styles/WindowStyles.xaml"/>
