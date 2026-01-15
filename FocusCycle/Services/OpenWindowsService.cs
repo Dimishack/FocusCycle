@@ -1,5 +1,4 @@
-﻿using FocusCycle.Models;
-using FocusCycle.Services.Interfaces;
+﻿using FocusCycle.Services.Interfaces;
 using FocusCycle.Views.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
@@ -20,7 +19,7 @@ namespace FocusCycle.Services
             var window = App.Services.GetRequiredService<SettingsWindow>();
             window.Closed += (_, _) => _settingsWindow = null;
             _settingsWindow = window;
-            _settingsWindow.Show();
+            ShowWindow(_settingsWindow);
         }
 
         public void OpenTimerWindow()
@@ -29,22 +28,31 @@ namespace FocusCycle.Services
             var window = App.Services.GetRequiredService<TimerWindow>();
             window.Closed += (_, _) => _timerWindow = null;
             _timerWindow = window;
-            _timerWindow.Show();
+            ShowWindow(_timerWindow);
         }
 
         public void OpenTopmostTimerWindow()
         {
-            if(CheckOpenWindow(_topmostTimerWindow)) return;
+            if (CheckOpenWindow(_topmostTimerWindow)) return;
             var window = App.Services.GetRequiredService<TopmostTimerWindow>();
             window.Closed += (_, _) => _topmostTimerWindow = null;
             _topmostTimerWindow = window;
-            _topmostTimerWindow.Show();
+            ShowWindow(_topmostTimerWindow);
         }
 
-        private bool CheckOpenWindow(Window? window)
+        private static bool CheckOpenWindow(Window? window)
         {
-            window?.Show();
-            return window is not null;
+            if (window != null)
+                ShowWindow(window);
+            return window != null;
+        }
+
+        private static void ShowWindow(Window window)
+        {
+            if (!window.IsVisible)
+                window.Show();
+            window.WindowState = WindowState.Normal;
+            window.Activate();
         }
     }
 }

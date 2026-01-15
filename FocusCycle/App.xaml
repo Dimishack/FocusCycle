@@ -17,7 +17,8 @@
                 <ResourceDictionary Source="Resources/Styles/ButtonStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/SliderStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/ToggleButtonStyles.xaml"/>
-                
+
+                <ResourceDictionary Source="Resources/Styles/ContextMenuStyles.xaml"/>
                 <ResourceDictionary Source="Resources/Styles/WindowStyles.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

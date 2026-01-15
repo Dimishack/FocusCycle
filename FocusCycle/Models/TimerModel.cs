@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel;
 using System.Timers;
 
 namespace FocusCycle.Models
@@ -53,10 +48,10 @@ namespace FocusCycle.Models
 
         public string TimerString => $"{Hours:00}:{Minutes:00}:{Seconds:00}";
 
-        #region ReloadTiemr : void - перезагрузить таймер
+        #region Restart : void - Перезапустить таймер
 
-        ///<summary>перезагрузить таймер</summary>
-        public void ReloadTiemr()
+        ///<summary>Перезапустить таймер</summary>
+        public void Restart()
         {
             bool isPause = IsTimerPause;
             _timer.Stop();

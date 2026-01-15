@@ -32,11 +32,11 @@
                  Grid.Row="1"
                  Margin="0,-15,0,0">
             <TextBlock Text="{Binding CurrentTimer.TimerString}"
-                   Foreground="{StaticResource SolidColorBrush_Marshmallow}"
-                   FontWeight="Bold"
-                   TextAlignment="Center">
+                       Foreground="{StaticResource SolidColorBrush_Marshmallow}"
+                       FontWeight="Bold"
+                       Opacity="{Binding TimerOpacity}"
+                       TextAlignment="Center">
             <i:Interaction.Behaviors>
-                <cusB:TextBlockFlickeringBehavior PlayFlicker="{Binding PlayFlicker}"/>
                 <cusB:DragMoveWindowBehavior/>
             </i:Interaction.Behaviors>
             </TextBlock>

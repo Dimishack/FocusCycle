@@ -7,9 +7,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
 	  <StartupObject>FocusCycle.Program</StartupObject>
+	  <ApplicationIcon>Resources\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\icon.ico" />
+    <None Remove="Resources\icon.png" />
     <None Remove="Resources\rington.wav" />
   </ItemGroup>
 
@@ -22,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Resources\icon.ico" />
     <Resource Include="Resources\Rington.wav">
       <CopyToOutputDirectory></CopyToOutputDirectory>
     </Resource>

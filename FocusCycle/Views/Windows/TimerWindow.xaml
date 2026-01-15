@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
         
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
         xmlns:vm="clr-namespace:FocusCycle.ViewModels"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:ap="clr-namespace:FocusCycle.Infrasctructure.AttachedProperties"
@@ -13,6 +14,7 @@
         d:DataContext="{d:DesignInstance {x:Type vm:TimerViewModel}}"
         ap:WindowProperties.ShowWindowManagerButtons="True"
         ap:WindowProperties.OpenSettingsCommand="{Binding OpenSettingsCommand}"
+        Visibility="{Binding WindowVisibility, UpdateSourceTrigger=PropertyChanged}"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
         Title="" Height="120" Width="270">
@@ -20,19 +22,27 @@
         <i:EventTrigger EventName="Loaded">
             <i:InvokeCommandAction Command="{Binding LoadedAsyncCommand}"/>
         </i:EventTrigger>
-        <i:EventTrigger EventName="Closed">
-            <i:InvokeCommandAction Command="{Binding ClosedCommand}"/>
-        </i:EventTrigger>
     </i:Interaction.Triggers>
+    <i:Interaction.Behaviors>
+        <cusB:WindowVisibilityBehavior WindowVisibility="{Binding WindowVisibility}"/>
+    </i:Interaction.Behaviors>
     <Window.Resources>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
     <DockPanel>
-        <tb:TaskbarIcon>
+        <tb:TaskbarIcon IconSource="/Resources/icon.ico" 
+                        ToolTipText="FocusCycle"
+                        DoubleClickCommand="{Binding ChangeWindowVisibilityCommand}">
             <tb:TaskbarIcon.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Header="Открыть FocusCycle"/>
-                    <MenuItem Header="Закрыть FocusCycle"/>
+                <ContextMenu Style="{StaticResource ContextMenuMainStyle}">
+                    <MenuItem Header="Открыть FocusCycle"
+                              Command="{Binding OpenWindowCommand}"/>
+                    <MenuItem Header="{Binding ActionTimerString}"
+                              Command="{Binding PlayPauseTimerCommand}"/>
+                    <MenuItem Header="Перезапустить таймер"
+                              Command="{Binding RestartTimerCommand}"/>
+                    <MenuItem Header="Закрыть FocusCycle"
+                              Command="{Binding ShutdownWindowAsyncCommand}"/>
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>

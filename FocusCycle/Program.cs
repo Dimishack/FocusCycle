@@ -11,7 +11,7 @@ namespace FocusCycle
 
             if (IsAlreadyRunning())
             {
-                MessageBox.Show("Данная программа уже запущена");
+                MessageBox.Show("Программа FocusCycle уже запущена");
                 return;
             }
             var app = new App();

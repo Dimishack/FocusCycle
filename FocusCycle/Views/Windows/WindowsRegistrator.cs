@@ -15,10 +15,15 @@ namespace FocusCycle.Views.Windows
                 InitializeCenterMainScreen(window);
                 return window;
             })
-            .AddTransient(services =>
+            .AddSingleton(services =>
             {
                 var viewModel = App.Services.GetRequiredService<TimerViewModel>();
-                var window = new TimerWindow() { DataContext = viewModel };
+                var window = new TimerWindow() { DataContext = viewModel};
+                window.Closing += (s, e) =>
+                {
+                    e.Cancel = true;
+                    ((Window?)s)?.Hide();
+                };
                 InitializeCenterMainScreen(window);
                 return window;
             })

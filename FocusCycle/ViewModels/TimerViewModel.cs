@@ -15,7 +15,7 @@ namespace FocusCycle.ViewModels
         private readonly string _settingsPath = Path.Combine(
             Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty,
             "Settings.bin");
-        private TimerSettings? _settings;
+        private TimerSettings _settings;
         private MediaModel _media;
 
         private readonly IMessageBus _messageBus;
@@ -23,6 +23,29 @@ namespace FocusCycle.ViewModels
         private readonly IOpenWindows _openWindows;
 
         #region Properties...
+
+        #region ActionTimerString : string - Действие с таймером
+
+        ///<summary>Действие с таймером</summary>
+        public string? ActionTimerString => _currentTimer.IsTimerPause
+            ? "Запустить таймер"
+            : "Остановить таймер";
+
+        #endregion
+
+        #region CurrentTimer : TimerModel - Таймер
+
+        ///<summary>Таймер</summary>
+        private TimerModel _currentTimer;
+
+        ///<summary>Таймер</summary>
+        public TimerModel CurrentTimer
+        {
+            get => _currentTimer;
+            set => Set(ref _currentTimer, value);
+        }
+
+        #endregion
 
         #region IsTimerPause : bool - Таймер на паузе
 
@@ -38,16 +61,16 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
-        #region CurrentTimer : TimerModel - Таймер
+        #region WindowVisibility : Visibility - Видимость окна
 
-        ///<summary>Таймер</summary>
-        private TimerModel _currentTimer;
+        ///<summary>Видимость окна</summary>
+        private Visibility _windowVisibility;
 
-        ///<summary>Таймер</summary>
-        public TimerModel CurrentTimer
+        ///<summary>Видимость окна</summary>
+        public Visibility WindowVisibility
         {
-            get => _currentTimer;
-            set => Set(ref _currentTimer, value);
+            get => _windowVisibility;
+            set => Set(ref _windowVisibility, value);
         }
 
         #endregion
@@ -71,14 +94,16 @@ namespace FocusCycle.ViewModels
             _media = new MediaModel();
 
             _settings = await ReadSettingsAsync();
+            _media.Volume = _settings.Volume;
             ((Command)PlayNextCycleCommand).OnRaiseCanExecuted();
             _currentTimer.Work = _settings.WorkTime;
             _currentTimer.Break = _settings.BreakTime;
-            _currentTimer.TimerActionChanged += _currentTimer_TimerActionChanged;
+            _currentTimer.TimerActionChanged += CurrentTimer_TimerActionChanged;
             _currentTimer.PlayNextTimer();
+            OnPropertyChanged(nameof(ActionTimerString));
         }
 
-        private void _currentTimer_TimerActionChanged(object? sender, TimerAction e)
+        private void CurrentTimer_TimerActionChanged(object? sender, TimerAction e)
         {
             switch (e)
             {
@@ -95,64 +120,34 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
-        #region ClosedCommand - Команда - закрытие
+        #region ChangeWindowVisibilityCommand - Команда - изменить видимость окна
 
-        ///<summary>Команда - закрытие</summary>
-        private ICommand? _closedCommand;
+        ///<summary>Команда - изменить видимость окна</summary>
+        private ICommand? _changeWindowVisibilityCommand;
 
-        ///<summary>Команда - закрытие</summary>
-        public ICommand ClosedCommand => _closedCommand
-            ??= new LambdaCommandAsync(OnClosedCommandExecuted);
+        ///<summary>Команда - изменить видимость окна</summary>
+        public ICommand ChangeWindowVisibilityCommand => _changeWindowVisibilityCommand
+            ??= new LambdaCommand(OnChangeWindowVisibilityCommandExecuted);
 
-        ///<summary>Логика выполнения - закрытие</summary>
-        private async Task OnClosedCommandExecuted(object? p)
-        {
-            _media?.Dispose();
-            _getEdittedSettingsSubscription.Dispose();
-            if (_settings is not null)
-                await WriteSettingsAsync(_settings);
-            App.Current.Shutdown();
-        }
+        ///<summary>Логика выполнения - изменить видимость окна</summary>
+        private void OnChangeWindowVisibilityCommandExecuted(object? p)
+            => WindowVisibility = _windowVisibility == Visibility.Visible
+            ? Visibility.Hidden
+            : Visibility.Visible;
 
         #endregion
 
-        #region PlayNextCycleCommand - Команда - запустить следующий цикл
+        #region OpenWindowCommand - Команда - открыть окно
 
-        ///<summary>Команда - запустить следующий цикл</summary>
-        private ICommand? _playNextCycleCommand;
+        ///<summary>Команда - открыть окно</summary>
+        private ICommand? _openWindowCommand;
 
-        ///<summary>Команда - запустить следующий цикл</summary>
-        public ICommand PlayNextCycleCommand => _playNextCycleCommand
-            ??= new LambdaCommand(OnPlayNextCycleCommandExecuted, CanPlayNextCycleCommandExecute);
+        ///<summary>Команда - открыть окно</summary>
+        public ICommand OpenWindowCommand => _openWindowCommand
+            ??= new LambdaCommand(OnOpenWindowCommandExecuted);
 
-        ///<summary>Проверка возможности выполнения - запустить следующий цикл</summary>
-        private bool CanPlayNextCycleCommandExecute(object? p) => _settings is not null;
-
-        ///<summary>Логика выполнения - запустить следующий цикл</summary>
-        private void OnPlayNextCycleCommandExecuted(object? p)
-        {
-            _currentTimer.PlayNextTimer();
-            IsTimerPause = false;
-        }
-
-        #endregion
-
-        #region PlayPauseTimerCommand - Команда - запустить/остановить таймер
-
-        ///<summary>Команда - запустить/остановить таймер</summary>
-        private ICommand? _playPauseTimerCommand;
-
-        ///<summary>Команда - запустить/остановить таймер</summary>
-        public ICommand PlayPauseTimerCommand => _playPauseTimerCommand
-            ??= new LambdaCommand(OnPlayPauseTimerCommandExecuted);
-
-        ///<summary>Логика выполнения - запустить/остановить таймер</summary>
-        private void OnPlayPauseTimerCommandExecuted(object? p)
-        {
-            if (_currentTimer.IsTimerPause)
-                _currentTimer.ResumeTimer();
-            else _currentTimer.PauseTimer();
-        }
+        ///<summary>Логика выполнения - открыть окно</summary>
+        private void OnOpenWindowCommandExecuted(object? p) => _openWindows.OpenTimerWindow();
 
         #endregion
 
@@ -203,6 +198,83 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
+        #region PlayNextCycleCommand - Команда - запустить следующий цикл
+
+        ///<summary>Команда - запустить следующий цикл</summary>
+        private ICommand? _playNextCycleCommand;
+
+        ///<summary>Команда - запустить следующий цикл</summary>
+        public ICommand PlayNextCycleCommand => _playNextCycleCommand
+            ??= new LambdaCommand(OnPlayNextCycleCommandExecuted, CanPlayNextCycleCommandExecute);
+
+        ///<summary>Проверка возможности выполнения - запустить следующий цикл</summary>
+        private bool CanPlayNextCycleCommandExecute(object? p) => _settings is not null;
+
+        ///<summary>Логика выполнения - запустить следующий цикл</summary>
+        private void OnPlayNextCycleCommandExecuted(object? p)
+        {
+            _currentTimer.PlayNextTimer();
+            IsTimerPause = false;
+        }
+
+        #endregion
+
+        #region PlayPauseTimerCommand - Команда - запустить/остановить таймер
+
+        ///<summary>Команда - запустить/остановить таймер</summary>
+        private ICommand? _playPauseTimerCommand;
+
+        ///<summary>Команда - запустить/остановить таймер</summary>
+        public ICommand PlayPauseTimerCommand => _playPauseTimerCommand
+            ??= new LambdaCommand(OnPlayPauseTimerCommandExecuted);
+
+        ///<summary>Логика выполнения - запустить/остановить таймер</summary>
+        private void OnPlayPauseTimerCommandExecuted(object? p)
+        {
+            if (_currentTimer.IsTimerPause)
+                _currentTimer.ResumeTimer();
+            else _currentTimer.PauseTimer();
+            IsTimerPause = _currentTimer.IsTimerPause;
+            OnPropertyChanged(nameof(ActionTimerString));
+        }
+
+        #endregion
+
+        #region RestartTimerCommand - Команда - перезапустить таймер
+
+        ///<summary>Команда - перезапустить таймер</summary>
+        private ICommand? _restartTimerCommand;
+
+        ///<summary>Команда - перезапустить таймер</summary>
+        public ICommand RestartTimerCommand => _restartTimerCommand
+            ??= new LambdaCommand(OnRestartTimerCommandExecuted);
+
+        ///<summary>Логика выполнения - перезапустить таймер</summary>
+        private void OnRestartTimerCommandExecuted(object? p) => _currentTimer.Restart();
+
+        #endregion
+
+        #region ShutdownWindowAsyncCommand - Команда - выключить окно
+
+        ///<summary>Команда - выключить окно</summary>
+        private ICommand? _shutdownWindowAsyncCommand;
+
+        ///<summary>Команда - выключить окно</summary>
+        public ICommand ShutdownWindowAsyncCommand => _shutdownWindowAsyncCommand
+            ??= new LambdaCommandAsync(OnShutdownWindowCommandExecuted);
+
+        ///<summary>Логика выполнения - выключить окно</summary>
+        private async Task OnShutdownWindowCommandExecuted(object? p)
+        {
+            _media?.Dispose();
+            _getEdittedSettingsSubscription.Dispose();
+            if (_settings is not null)
+                await WriteSettingsAsync(_settings);
+            App.Current.Shutdown();
+        }
+
+        #endregion
+
         #endregion
 
         #region Methods...
@@ -237,6 +309,14 @@ namespace FocusCycle.ViewModels
 
         #endregion
 
+        #region ShowMessageQuestion : MessageBoxResult - Отобразить сообщение-вопрос
+
+        ///<summary>Отобразить сообщение-вопрос</summary>
+        private MessageBoxResult ShowMessageQuestion(string question)
+            => MessageBox.Show(question, "FocusCycle", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+        #endregion
+
         #endregion
 
         #region Subscrtiprions...
@@ -246,22 +326,36 @@ namespace FocusCycle.ViewModels
         ///<summary>Получить измененные настройки</summary>
         private void GetEdittedSettings(TimerSettings? edittedSettings)
         {
-            if (edittedSettings is null
-                || _settings is null) return;
+            if (edittedSettings is null) return;
+
+            bool isWorkTimeChanged = false, 
+                isBreakTimeChanged = false;
+
+            string textWarning = "(Если нет, то новые изменения вступят в силу после перезагрузки программы)";
+
             _settings.WorkTime = edittedSettings.WorkTime;
             _settings.BreakTime = edittedSettings.BreakTime;
             _settings.Volume = edittedSettings.Volume;
             _media.Volume = edittedSettings.Volume;
-            if (MessageBox.Show("Изменить текущие времена на измененные?",
-                "FocusCycle",
-                MessageBoxButton.YesNo,
-                MessageBoxImage.Question)
+
+            if (_currentTimer.Work != edittedSettings.WorkTime
+                && ShowMessageQuestion($"Изменить текущий таймер работы на новый?\r\n{textWarning}")
                 == MessageBoxResult.Yes)
             {
                 _currentTimer.Work = edittedSettings.WorkTime;
-                _currentTimer.Break = edittedSettings.BreakTime;
-                _currentTimer.ReloadTiemr();
+                isWorkTimeChanged = true;
             }
+            if (_currentTimer.Break != edittedSettings.BreakTime
+                && ShowMessageQuestion($"Изменить текущий таймер перерыва на новый?\r\n{textWarning}")
+                == MessageBoxResult.Yes)
+            {
+                _currentTimer.Break = edittedSettings.BreakTime;
+                isBreakTimeChanged = true;
+            }
+            if ((_currentTimer.IsCurrentWorkTimer && isWorkTimeChanged
+                || !_currentTimer.IsCurrentWorkTimer && isBreakTimeChanged)
+                && ShowMessageQuestion("Перезапустить таймер?") == MessageBoxResult.Yes)
+                RestartTimerCommand.Execute(null);
         }
 
         #endregion
@@ -270,11 +364,11 @@ namespace FocusCycle.ViewModels
 
         public TimerViewModel(IMessageBus messageBus, IOpenWindows openWindows)
         {
+            CurrentTimer = new();
             _messageBus = messageBus;
             _openWindows = openWindows;
             _getEdittedSettingsSubscription = messageBus
                 .RegisterHandler<TimerSettings?>(GetEdittedSettings);
-            _currentTimer = new TimerModel();
         }
 
     }

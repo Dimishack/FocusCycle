@@ -3,6 +3,7 @@ using FocusCycle.Models;
 using FocusCycle.Services.Interfaces;
 using FocusCycle.ViewModels.Base;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace FocusCycle.ViewModels
 {
@@ -10,19 +11,20 @@ namespace FocusCycle.ViewModels
     {
         private readonly IMessageBus _messageBus;
         private readonly IDisposable _getCurrentTimerSubscription;
+        private readonly DispatcherTimer _flickerTimer;
 
         #region Properties...
 
-        #region PlayFlicker : bool - Запустить мерцание
+        #region TimerOpacity : double - Видимость таймера
 
-        ///<summary>Запустить мерцание</summary>
-        private bool _playFlicker;
+        ///<summary>Видимость таймера</summary>
+        private double _timerOpacity;
 
-        ///<summary>Запустить мерцание</summary>
-        public bool PlayFlicker
+        ///<summary>Видимость таймера</summary>
+        public double TimerOpacity
         {
-            get => _playFlicker;
-            set => Set(ref _playFlicker, value);
+            get => _timerOpacity;
+            set => Set(ref _timerOpacity, value);
         }
 
         #endregion
@@ -60,6 +62,7 @@ namespace FocusCycle.ViewModels
             if (_currentTimer is not null)
                 _currentTimer.TimerActionChanged -= TimerActionChanged;
             _getCurrentTimerSubscription.Dispose();
+            _flickerTimer.Tick -= FlickerTimer_Tick;
             App.CloseConnectedWindow(this);
         }
 
@@ -76,7 +79,7 @@ namespace FocusCycle.ViewModels
         {
             CurrentTimer = timerModel;
             if (CurrentTimer.IsTimerPause)
-                PlayFlicker = true;
+                _flickerTimer.Start();
             CurrentTimer.TimerActionChanged += TimerActionChanged;
         }
 
@@ -92,11 +95,12 @@ namespace FocusCycle.ViewModels
             {
                 case TimerAction.Start:
                 case TimerAction.Resume:
-                    PlayFlicker = false;
+                    _flickerTimer.Stop();
+                    TimerOpacity = 1.0;
                     break;
                 case TimerAction.End:
                 case TimerAction.Stop:
-                    PlayFlicker = true;
+                    _flickerTimer.Start();
                     break;
                 default:
                     break;
@@ -110,6 +114,13 @@ namespace FocusCycle.ViewModels
             _messageBus = messageBus;
             _getCurrentTimerSubscription = messageBus
                 .RegisterHandler<TimerModel>(GetCurrentTimer);
+            _timerOpacity = 1.0;
+            _flickerTimer = new DispatcherTimer();
+            _flickerTimer.Interval = TimeSpan.FromSeconds(1);
+            _flickerTimer.Tick += FlickerTimer_Tick;
         }
+
+        private void FlickerTimer_Tick(object? sender, EventArgs e) 
+            => TimerOpacity = 1.0 - _timerOpacity;
     }
 }
