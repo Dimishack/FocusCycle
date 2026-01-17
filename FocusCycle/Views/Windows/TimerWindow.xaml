@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
         
+        xmlns:conv="clr-namespace:FocusCycle.Infrasctructure.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
         xmlns:vm="clr-namespace:FocusCycle.ViewModels"
@@ -14,19 +15,20 @@
         d:DataContext="{d:DesignInstance {x:Type vm:TimerViewModel}}"
         ap:WindowProperties.ShowWindowManagerButtons="True"
         ap:WindowProperties.OpenSettingsCommand="{Binding OpenSettingsCommand}"
-        Visibility="{Binding WindowVisibility, UpdateSourceTrigger=PropertyChanged}"
         mc:Ignorable="d"
         Style="{StaticResource WindowMainStyle}"
         Title="" Height="120" Width="270">
     <i:Interaction.Triggers>
         <i:EventTrigger EventName="Loaded">
-            <i:InvokeCommandAction Command="{Binding LoadedAsyncCommand}"/>
+            <i:InvokeCommandAction Command="{Binding LoadedCommand}"/>
         </i:EventTrigger>
     </i:Interaction.Triggers>
     <i:Interaction.Behaviors>
-        <cusB:WindowVisibilityBehavior WindowVisibility="{Binding WindowVisibility}"/>
+        <cusB:WindowVisibilityBehavior 
+            IsChangeWindowVisibility="{Binding IsChangeWindowVisibility}"/>
     </i:Interaction.Behaviors>
     <Window.Resources>
+        <conv:CurrentCycleConverter x:Key="CurrentCycleConverter"/>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
     <DockPanel>
@@ -53,7 +55,8 @@
                 <ColumnDefinition Width="35"/>
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="1"
-                       Text="{Binding CurrentTimer.CurrentTimerString}"
+                       Text="{Binding CycleTimer.CurrentCycle, 
+                            Converter={StaticResource CurrentCycleConverter}}"
                        FontSize="28"
                        FontWeight="Black"
                        TextAlignment="Center"
@@ -76,7 +79,7 @@
                 Style="{StaticResource NextCycleButtonStyle}"
                 VerticalAlignment="Top"
                 Command="{Binding PlayNextCycleCommand}"/>
-        <TextBlock Text="{Binding CurrentTimer.TimerString}"
+        <TextBlock Text="{Binding CycleTimer.TimerString}"
                    FontWeight="Bold"
                    FontSize="40"
                    HorizontalAlignment="Stretch"

@@ -12,10 +12,12 @@
         ShowInTaskbar="False"
         Background="{StaticResource SolidColorBrush_Transparent}"
         
+        xmlns:conv="clr-namespace:FocusCycle.Infrasctructure.Converters"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
         Height="100" Width="320">
     <Window.Resources>
+        <conv:CurrentCycleConverter x:Key="CurrentCycleConverter"/>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}"/>
     </Window.Resources>
     <Grid>
@@ -31,7 +33,7 @@
                  Grid.ColumnSpan="2"
                  Grid.Row="1"
                  Margin="0,-15,0,0">
-            <TextBlock Text="{Binding CurrentTimer.TimerString}"
+            <TextBlock Text="{Binding CycleTimer.TimerString}"
                        Foreground="{StaticResource SolidColorBrush_Marshmallow}"
                        FontWeight="Bold"
                        Opacity="{Binding TimerOpacity}"
@@ -43,7 +45,8 @@
         </Viewbox>
         <TextBlock Grid.Row="0" 
                    Grid.Column="0" 
-                   Text="{Binding CurrentTimer.CurrentTimerString}"
+                   Text="{Binding CycleTimer.CurrentCycle, 
+                    Converter={StaticResource CurrentCycleConverter}}"
                    FontSize="28"
                    FontWeight="Black"
                    TextAlignment="Center"

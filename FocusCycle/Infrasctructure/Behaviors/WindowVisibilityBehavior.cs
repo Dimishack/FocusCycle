@@ -5,35 +5,36 @@ namespace FocusCycle.Infrasctructure.Behaviors
 {
     class WindowVisibilityBehavior : Behavior<Window>
     {
-        #region WindowVisibility : Visibility - Видимость окн
+        #region IsChangeWindowVisibility : bool - Изменить видимость окна
 
-        ///<summary> Видимость окн (DependencyProperty). </summary>
-        public static readonly DependencyProperty WindowVisibilityProperty =
-            DependencyProperty.Register(nameof(WindowVisibility),
-                    typeof(Visibility),
+        ///<summary> Изменить видимость окна (DependencyProperty). </summary>
+        public static readonly DependencyProperty IsChangeWindowVisibilityProperty =
+            DependencyProperty.Register(nameof(IsChangeWindowVisibility),
+                    typeof(bool),
                     typeof(WindowVisibilityBehavior),
-                    new PropertyMetadata(Visibility.Visible, OnWindowVisibilityChanged));
+                    new FrameworkPropertyMetadata(false, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault, OnIsChangeWindowVisibilityd));
 
-        private static void OnWindowVisibilityChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnIsChangeWindowVisibilityd(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if(d is WindowVisibilityBehavior behavior
-                && e.NewValue is Visibility visibility)
+            if(d is WindowVisibilityBehavior behavior && (bool)e.NewValue)
             {
-                if (visibility == Visibility.Visible)
+                if (behavior.AssociatedObject.Visibility != Visibility.Visible)
+                {
                     behavior.AssociatedObject.Show();
+                    behavior.AssociatedObject.Activate();
+                }
                 else behavior.AssociatedObject.Hide();
+                App.Current.Dispatcher.BeginInvoke(() => behavior.IsChangeWindowVisibility = false);
             }
-
         }
 
-        ///<summary> Видимость окн. </summary>
-        public Visibility WindowVisibility
+        ///<summary> Изменить видимость окна. </summary>
+        public bool IsChangeWindowVisibility
         {
-            get => (Visibility)GetValue(WindowVisibilityProperty);
-            set => SetValue(WindowVisibilityProperty, value);
+            get => (bool)GetValue(IsChangeWindowVisibilityProperty);
+            set => SetValue(IsChangeWindowVisibilityProperty, value);
         }
 
         #endregion
-
     }
 }

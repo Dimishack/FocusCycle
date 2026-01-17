@@ -4,7 +4,8 @@
     {
         Start = 0,
         End = 1,
-        Stop = 2,
-        Resume = 3
+        Pause = 2,
+        Resume = 3,
+        Restart = 4
     }
 }

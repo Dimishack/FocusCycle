@@ -46,7 +46,7 @@ namespace FocusCycle.Models
         public void Dispose()
         {
             _mediaPlayer.Stop();
-            _mediaPlayer.MediaEnded -= _mediaPlayer_MediaEnded;
+            _mediaPlayer.MediaEnded -= MediaEnded;
             _mediaPlayer.Close();
             if(Directory.Exists(_tempDirectory))
                 Directory.Delete(_tempDirectory, true);
@@ -55,15 +55,15 @@ namespace FocusCycle.Models
         public MediaModel()
         {
             _mediaPlayer = new MediaPlayer();
-            _mediaPlayer.MediaEnded += _mediaPlayer_MediaEnded;
+            _mediaPlayer.MediaEnded += MediaEnded;
         }
 
-        private Stream InitializeStream() => App
+        private static Stream InitializeStream() => App
             .GetResourceStream((Uri)App.Current.Resources["Notification"])
             .Stream;
 
 
-        private void _mediaPlayer_MediaEnded(object? sender, EventArgs e)
+        private void MediaEnded(object? sender, EventArgs e)
         {
             _mediaPlayer.Position = TimeSpan.Zero;
             _mediaPlayer.Play();

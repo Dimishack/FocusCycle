@@ -13,11 +13,10 @@ namespace FocusCycle.ViewModels
     {
         private const string REGISTRYNAME = "FocusCycle";
         private const string REGISTRYKEY_PATH = "Software\\Microsoft\\Windows\\CurrentVersion\\Run\\";
+        private readonly RegistryKey _registryKey;
+        private readonly ITimerSettings _settings;
 
-        private readonly IMessageBus _messageBus;
-        private readonly IDisposable _getSettingsSubscription;
-        private TimerSettings? _edittingSettings;
-        private bool _currentAutorun;
+        private readonly bool _currentAutorun;
 
         #region Properties...
 
@@ -33,7 +32,7 @@ namespace FocusCycle.ViewModels
             set
             {
                 if (!Set(ref _isAutorun, value)) return;
-                ((Command)EditSettingsCommand).OnRaiseCanExecuted();
+                ((Command)EditSettingsAsyncCommand).OnRaiseCanExecuted();
             }
         }
 
@@ -51,7 +50,7 @@ namespace FocusCycle.ViewModels
             set
             {
                 if (!Set(ref _workTime, value)) return;
-                ((Command)EditSettingsCommand).OnRaiseCanExecuted();
+                ((Command)EditSettingsAsyncCommand).OnRaiseCanExecuted();
             }
         }
 
@@ -69,26 +68,26 @@ namespace FocusCycle.ViewModels
             set
             {
                 if (!Set(ref _breakTime, value)) return;
-                ((Command)EditSettingsCommand).OnRaiseCanExecuted();
+                ((Command)EditSettingsAsyncCommand).OnRaiseCanExecuted();
             }
         }
 
         #endregion
 
-        #region Volume : double - Громкость
+        #region Volume : float - Громкость
 
         ///<summary>Громкость</summary>
-        private double _volume;
+        private float _volume;
 
         ///<summary>Громкость</summary>
-        public double Volume
+        public float Volume
         {
             get => _volume;
             set
             {
-                if(!Set(ref _volume, value)) return;
-                VolumeProcent = value * 100.0;
-                ((Command)EditSettingsCommand).OnRaiseCanExecuted();
+                if (!Set(ref _volume, value)) return;
+                VolumeProcent = value * 100.0F;
+                ((Command)EditSettingsAsyncCommand).OnRaiseCanExecuted();
             }
         }
 
@@ -97,16 +96,16 @@ namespace FocusCycle.ViewModels
         #region VolumeProcent : double - Громкость в процентах
 
         ///<summary>Громкость в процентах</summary>
-        private double _volumeProcent;
+        private float _volumeProcent;
 
         ///<summary>Громкость в процентах</summary>
-        public double VolumeProcent
+        public float VolumeProcent
         {
             get => _volumeProcent;
             set
             {
-                if(!Set(ref _volumeProcent, value)) return;
-                Volume = value / 100.0;
+                if (!Set(ref _volumeProcent, value)) return;
+                Volume = value / 100.0F;
             }
         }
 
@@ -116,25 +115,24 @@ namespace FocusCycle.ViewModels
 
         #region Commands...
 
-        #region EditSettingsCommand - Команда - изменить настройки
+        #region EditSettingsAsyncCommand - Команда - изменить настройки
 
         ///<summary>Команда - изменить настройки</summary>
-        private ICommand? _editSettingsCommand;
+        private ICommand? _editSettingsAsyncCommand;
 
         ///<summary>Команда - изменить настройки</summary>
-        public ICommand EditSettingsCommand => _editSettingsCommand
-            ??= new LambdaCommand(OnEditSettingsCommandExecuted, CanEditSettingsCommandExecute);
+        public ICommand EditSettingsAsyncCommand => _editSettingsAsyncCommand
+            ??= new LambdaCommandAsync(OnEditSettingsCommandExecuted, CanEditSettingsCommandExecute);
 
         ///<summary>Проверка возможности выполнения - изменить настройки</summary>
         private bool CanEditSettingsCommandExecute(object? p)
-            => _edittingSettings is not null
-            && (_currentAutorun != _isAutorun
-             || _edittingSettings.WorkTime != _workTime
-             || _edittingSettings.BreakTime != _breakTime
-             || _edittingSettings.Volume != _volume);
+            => _currentAutorun != _isAutorun
+             || _settings.WorkTime != _workTime
+             || _settings.BreakTime != _breakTime
+             || _settings.VolumeNotify != _volume;
 
         ///<summary>Логика выполнения - изменить настройки</summary>
-        private void OnEditSettingsCommandExecuted(object? p)
+        private async Task OnEditSettingsCommandExecuted(object? p)
         {
             TimerSettings editiingSettings = new()
             {
@@ -142,9 +140,8 @@ namespace FocusCycle.ViewModels
                 BreakTime = _breakTime,
                 Volume = _volume,
             };
-            if (_currentAutorun != _isAutorun)
-                UpdateRegistry(!_isAutorun);
-            SendEdittingSettings(editiingSettings);
+            UpdateRegistry(_isAutorun);
+            await _settings.UpdateSettingsAsync(editiingSettings);
             CloseWindow();
         }
 
@@ -162,7 +159,7 @@ namespace FocusCycle.ViewModels
         ///<summary>Логика выполнения - отменить изменения</summary>
         private void OnCancelEditCommandExecuted(object? p)
         {
-            SendEdittingSettings(null);
+            _settings.UpdateSettings(null);
             CloseWindow();
         }
 
@@ -175,21 +172,30 @@ namespace FocusCycle.ViewModels
         #region UpdateRegistry : void - Обновить реестр
 
         ///<summary>Обновить реестр</summary>
-        private void UpdateRegistry(bool isDelete)
+        private bool UpdateRegistry(bool isAutorun)
         {
-            using (var registryKey = Registry.CurrentUser.OpenSubKey(REGISTRYKEY_PATH, true))
+            if (isAutorun == _currentAutorun) return false;
+            try
             {
-                if (isDelete)
-                    registryKey?.DeleteValue(REGISTRYNAME);
+                if (!isAutorun)
+                    _registryKey.DeleteValue(REGISTRYNAME);
                 else
                 {
                     string? processPath = Environment.ProcessPath;
-                    if (processPath != null)
-                        registryKey?.SetValue(REGISTRYNAME, processPath);
-                    else
+                    if (processPath is null)
+                    {
                         MessageBox.Show("Не удалось добавить программу в автозапусе, " +
                             "так как не удается получить путь к программе");
+                        return false;
+                    }
+                    _registryKey.SetValue(REGISTRYNAME, processPath);
                 }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+                return false;
             }
         }
 
@@ -200,48 +206,24 @@ namespace FocusCycle.ViewModels
         ///<summary>Закрыть окно</summary>
         private void CloseWindow()
         {
-            _edittingSettings = null;
-            _getSettingsSubscription.Dispose();
+            _registryKey.Dispose();
             App.CloseConnectedWindow(this);
         }
 
         #endregion
 
-        #region SendEdittingSettings : void - Отправить измененные настройки
-
-        ///<summary>Отправить измененные настройки</summary>
-        private void SendEdittingSettings(TimerSettings? settings)
-            => _messageBus.Send(this, settings);
-
         #endregion
 
-        #endregion
-
-        #region Subscriptions...
-
-        #region GetSettings : void - Получить настройки
-
-        ///<summary>Получить настройки</summary>
-        private void GetSettings(TimerSettings edittingSettings)
+        public SettingsViewModel(ITimerSettings settings)
         {
-            _edittingSettings = edittingSettings;
-            using (var registryKey = Registry.CurrentUser.OpenSubKey(REGISTRYKEY_PATH))
-                _currentAutorun = registryKey?.GetValue(REGISTRYNAME) is not null;
-            IsAutorun = _currentAutorun;
-            WorkTime = edittingSettings.WorkTime;
-            BreakTime = edittingSettings.BreakTime;
-            Volume = edittingSettings.Volume;
-        }
-
-        #endregion
-
-        #endregion
-
-        public SettingsViewModel(IMessageBus messageBus)
-        {
-            _messageBus = messageBus;
-            _getSettingsSubscription = messageBus
-                .RegisterHandler<TimerSettings>(GetSettings);
+            _registryKey = Registry.CurrentUser.OpenSubKey(REGISTRYKEY_PATH, true)
+                ?? throw new ArgumentException("Нет ключа");
+            _isAutorun = _currentAutorun = _registryKey.GetValue(REGISTRYNAME) is not null;
+            _settings = settings;
+            _workTime = settings.WorkTime;
+            _breakTime = settings.BreakTime;
+            _volume = settings.VolumeNotify;
+            _volumeProcent = _volume * 100.0F;
         }
     }
 }

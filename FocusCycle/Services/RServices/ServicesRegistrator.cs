@@ -7,7 +7,8 @@ namespace FocusCycle.Services.RLServices
     {
         public static IServiceCollection AddServices(this IServiceCollection services) => services
             .AddSingleton<IOpenWindows, OpenWindowsService>()
-            .AddSingleton<IMessageBus, MessageBusService>()
+            .AddSingleton<ICycleTimer, CycleTimerService>()
+            .AddSingleton<ITimerSettings, TimerSettingsService>()
             ;
     }
 }

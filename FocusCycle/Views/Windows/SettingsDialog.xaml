@@ -1,18 +1,18 @@
-﻿<Window x:Class="FocusCycle.Views.Windows.SettingsWindow"
+﻿<Window x:Class="FocusCycle.Views.Windows.SettingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FocusCycle.Views.Windows"
-        mc:Ignorable="d"
-        Style="{StaticResource WindowMainStyle}"
         
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
         xmlns:cusB="clr-namespace:FocusCycle.Infrasctructure.Behaviors"
+        xmlns:commands="clr-namespace:FocusCycle.Infrasctructure.Commands"
         
-        xmlns:vm="clr-namespace:FocusCycle.ViewModels"
-        d:DataContext="{d:DesignInstance {x:Type vm:SettingsViewModel}, IsDesignTimeCreatable=True}"
-        Title="Настройки" Height="180" Width="300">
+        Style="{StaticResource WindowMainStyle}"
+        
+        mc:Ignorable="d"
+        Title="Н а с т р о й к и" Height="180" Width="300">
     <Window.Resources>
         <Style TargetType="TextBox" BasedOn="{StaticResource TextBoxMainStyle}"/>
         <Style TargetType="TextBlock" BasedOn="{StaticResource TextBlockMainStyle}">
@@ -30,11 +30,11 @@
     </Window.Resources>
     <DockPanel>
         <UniformGrid Rows="1"
-                     DockPanel.Dock="Bottom"
-                     Margin="0,0,0,3">
+                 DockPanel.Dock="Bottom"
+                 Margin="0,0,0,3">
             <Button Style="{StaticResource CheckCancelButtonStyle}"
                     IsDefault="True"
-                    Command="{Binding EditSettingsCommand}"/>
+                    Command="{Binding EditSettingsAsyncCommand}"/>
             <Button Style="{StaticResource CheckCancelButtonStyle}"
                     IsCancel="True"
                     Command="{Binding CancelEditCommand}"/>
@@ -51,52 +51,52 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Grid.Column="0"
-                   Grid.Row="0"
-                   Text="Автозапуск:"/>
+               Grid.Row="0"
+               Text="Автозапуск:"/>
             <CheckBox Grid.Column="1"
-                      Grid.Row="0"
-                      HorizontalAlignment="Left"
-                      Style="{StaticResource CheckBoxMainStyle}"
-                      IsChecked="{Binding IsAutorun}"/>
+                  Grid.Row="0"
+                  HorizontalAlignment="Left"
+                  Style="{StaticResource CheckBoxMainStyle}"
+                  IsChecked="{Binding IsAutorun}"/>
 
             <TextBlock Grid.Column="0"
-                       Grid.Row="1"
-                       Text="Время работы:"/>
+                   Grid.Row="1"
+                   Text="Время работы:"/>
             <TextBox Grid.Column="1"
-                     Grid.Row="1"
-                     Text="{Binding WorkTime, UpdateSourceTrigger=PropertyChanged}"/>
+                 Grid.Row="1"
+                 Text="{Binding WorkTime, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Grid.Column="0"
-                       Grid.Row="2"
-                       Text="Время перерыва:"/>
+                   Grid.Row="2"
+                   Text="Время перерыва:"/>
             <TextBox Grid.Column="1"
-                     Grid.Row="2"
-                     Text="{Binding BreakTime, UpdateSourceTrigger=PropertyChanged}"/>
+                 Grid.Row="2"
+                 Text="{Binding BreakTime, UpdateSourceTrigger=PropertyChanged}"/>
 
             <TextBlock Grid.Column="0"
-                       Grid.Row="3"
-                       Text="Громкость:"/>
+                   Grid.Row="3"
+                   Text="Громкость:"/>
             <DockPanel Grid.Column="1"
-                       Grid.Row="3">
+                   Grid.Row="3">
                 <TextBox DockPanel.Dock="Right"
-                         Width="30"
-                         Text="{Binding VolumeProcent, 
-                            StringFormat='{}{0:F0}',
-                            UpdateSourceTrigger=PropertyChanged}">
+                     Width="30"
+                     Text="{Binding VolumeProcent,
+                        StringFormat='{}{0:F0}',
+                        UpdateSourceTrigger=PropertyChanged}">
                     <i:Interaction.Behaviors>
                         <cusB:OnlyDigitsBehavior MaxValue="100"/>
                     </i:Interaction.Behaviors>
                 </TextBox>
                 <Slider Minimum="0"
-                        Maximum="1"
-                        VerticalAlignment="Center"
-                        Margin="1,0"
-                        LargeChange="0.1"
-                        SmallChange="0.1"
-                        IsSnapToTickEnabled="True"
-                        TickFrequency="0.01"
-                        Value="{Binding Volume}"
-                        Style="{StaticResource SliderMainStyle}"/>
+                    Maximum="1"
+                    VerticalAlignment="Center"
+                    Margin="1,0"
+                    LargeChange="0.05"
+                    SmallChange="0.01"
+                    IsSnapToTickEnabled="True"
+                    TickFrequency="0.01"
+                    Value="{Binding Volume}"
+                    Style="{StaticResource SliderMainStyle}"/>
             </DockPanel>
         </Grid>
     </DockPanel>

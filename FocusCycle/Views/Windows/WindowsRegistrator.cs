@@ -7,14 +7,6 @@ namespace FocusCycle.Views.Windows
     internal static class WindowsRegistrator
     {
         public static IServiceCollection AddWindows(this IServiceCollection services) => services
-            .AddTransient(services =>
-            {
-                var viewModel = App.Services.GetRequiredService<StartWViewModel>();
-                var window = new StartWindow() { DataContext = viewModel };
-
-                InitializeCenterMainScreen(window);
-                return window;
-            })
             .AddSingleton(services =>
             {
                 var viewModel = App.Services.GetRequiredService<TimerViewModel>();
@@ -31,7 +23,7 @@ namespace FocusCycle.Views.Windows
             {
                 var viewModel = App.Services.GetRequiredService<TopmostTimerViewModel>();
                 var activedWindow = App.AcivedWindow;
-                var window = new TopmostTimerWindow
+                var window = new TopmostTimerWindow()
                 {
                     DataContext = viewModel,
                     Top = activedWindow.Top + activedWindow.Width / 2,
@@ -43,7 +35,7 @@ namespace FocusCycle.Views.Windows
             .AddTransient(services =>
             {
                 var viewModel = App.Services.GetRequiredService<SettingsViewModel>();
-                var window = new SettingsWindow()
+                var window = new SettingsDialog()
                 {
                     DataContext = viewModel,
                     Owner = App.AcivedWindow,
