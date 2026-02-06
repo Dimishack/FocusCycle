@@ -7,7 +7,6 @@ namespace FocusCycle.Services
 {
     class TimerSettingsService : ITimerSettings
     {
-        private readonly FileStream _fs;
         private readonly TimerSettings _settings;
         private readonly string _path = Path.Combine(
             Path.GetDirectoryName(Environment.ProcessPath) ?? string.Empty,
@@ -47,7 +46,11 @@ namespace FocusCycle.Services
         ///<summary>Прочитать настройки</summary>
         private TimerSettings? ReadSettings()
         {
-            try { return MessagePackSerializer.Deserialize<TimerSettings>(_fs); }
+            try
+            {
+                using (FileStream fs = new(_path, FileMode.Open))
+                    return MessagePackSerializer.Deserialize<TimerSettings>(fs);
+            }
             catch (Exception) { return null; }
         }
 
@@ -59,7 +62,8 @@ namespace FocusCycle.Services
         public async Task UpdateSettingsAsync(TimerSettings? newSettings)
         {
             if (Update(newSettings))
-                await MessagePackSerializer.SerializeAsync(_fs, newSettings);
+                using (FileStream fs = new(_path, FileMode.Create, FileAccess.Write))
+                    await MessagePackSerializer.SerializeAsync(fs, newSettings);
         }
 
         #endregion
@@ -70,12 +74,13 @@ namespace FocusCycle.Services
         public void UpdateSettings(TimerSettings? newSettings)
         {
             if (Update(newSettings))
-                MessagePackSerializer.Serialize(_fs, newSettings);
+                using (FileStream fs = new(_path, FileMode.Create, FileAccess.Write))
+                    MessagePackSerializer.Serialize(fs, newSettings);
         }
 
         #endregion
 
-        public void Dispose() { _fs.Dispose(); }
+        public void Dispose() { }
 
         #region Update : bool - Обновить настройки
 
@@ -100,7 +105,6 @@ namespace FocusCycle.Services
 
         public TimerSettingsService()
         {
-            _fs = new FileStream(_path, FileMode.OpenOrCreate);
             var settings = ReadSettings();
             _settings = settings ?? new TimerSettings();
         }
